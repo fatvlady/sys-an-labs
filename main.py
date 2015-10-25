@@ -4,7 +4,7 @@ __author__ = 'vlad'
 import sys
 import numpy as np
 
-from PyQt5.QtCore import pyqtSlot,pyqtSignal,Qt
+from PyQt5.QtCore import pyqtSlot, pyqtSignal, Qt
 from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog
 from PyQt5.uic import loadUiType
 
@@ -14,7 +14,6 @@ form_class, base_class = loadUiType('main_window.ui')
 
 
 class MainWindow(QDialog, form_class):
-
     # signals:
     input_changed = pyqtSignal('QString')
     output_changed = pyqtSignal('QString')
@@ -59,7 +58,7 @@ class MainWindow(QDialog, form_class):
 
     @pyqtSlot()
     def input_clicked(self):
-        filename = QFileDialog.getOpenFileName(self,'Open data file','.', 'Data file (*.txt *.dat)')[0]
+        filename = QFileDialog.getOpenFileName(self, 'Open data file', '.', 'Data file (*.txt *.dat)')[0]
         if filename == '':
             return
         if filename != self.input_path:
@@ -75,7 +74,7 @@ class MainWindow(QDialog, form_class):
 
     @pyqtSlot()
     def output_clicked(self):
-        filename = QFileDialog.getSaveFileName(self,'Save data file','.', 'Data file (*.txt)')[0]
+        filename = QFileDialog.getSaveFileName(self, 'Save data file', '.', 'Data file (*.txt)')[0]
         if filename == '':
             return
         if filename != self.output_path:
@@ -141,7 +140,7 @@ class MainWindow(QDialog, form_class):
     @pyqtSlot()
     def exec_clicked(self):
         self.solution = None
-        self.results_field.setText('Results ' + str(np.random.randint(10)))
+        self.results_field.setText('Results for' + str(self.__get_params()))
         return
 
     @pyqtSlot(bool)
@@ -155,13 +154,12 @@ class MainWindow(QDialog, form_class):
         return
 
     def __get_params(self):
-        return dict(poly_type=self.type,degrees=self.degrees,dimentions=self.dimensions,
-                    samples=self.samples_num,input_file=self.input_path,output_file=self.output_path,
-                    weights=self.weight_method,lambda_multiblock=self.lambda_multiblock)
+        return dict(poly_type=self.type, degrees=self.degrees, dimentions=self.dimensions,
+                    samples=self.samples_num, input_file=self.input_path, output_file=self.output_path,
+                    weights=self.weight_method, lambda_multiblock=self.lambda_multiblock)
 
 
-
-#-----------------------------------------------------#
+# -----------------------------------------------------#
 form = MainWindow()
 form.setWindowTitle('System Analysis - Lab 2')
 form.show()
