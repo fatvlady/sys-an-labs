@@ -37,9 +37,9 @@ class MainWindow(QDialog, form_class):
         self.setupUi(self)
 
         # other initializations
-        self.dimensions = np.array([self.x1_dim.value, self.x2_dim.value,
-                                    self.x3_dim.value, self.y_dim.value])
-        self.degrees = np.array([self.x1_deg.value, self.x2_deg.value, self.x3_deg.value])
+        self.dimensions = np.array([self.x1_dim.value(), self.x2_dim.value(),
+                                    self.x3_dim.value(), self.y_dim.value()])
+        self.degrees = np.array([self.x1_deg.value(), self.x2_deg.value(), self.x3_deg.value()])
         self.type = 'null'
         if self.radio_cheb.isChecked():
             self.type = 'chebyshev'
@@ -51,6 +51,10 @@ class MainWindow(QDialog, form_class):
             self.type = 'hermit'
         self.input_path = ''
         self.output_path = ''
+        self.samples_num = self.sample_spin.value()
+        self.lambda_multiblock = self.lambda_check.isChecked()
+        self.weight_method = self.weights_box.currentText().lower()
+        self.solution = None
         return
 
     @pyqtSlot()
@@ -61,54 +65,99 @@ class MainWindow(QDialog, form_class):
         if filename != self.input_path:
             self.input_path = filename
             self.input_changed.emit(filename)
-        print(filename)
         return
 
     @pyqtSlot('QString')
     def input_modified(self, value):
-        print('new input: ' + value)
+        if value != self.input_path:
+            self.input_path = value
         return
 
     @pyqtSlot()
     def output_clicked(self):
-        print('output clicked')
+        filename = QFileDialog.getSaveFileName(self,'Save data file','.', 'Data file (*.txt)')[0]
+        if filename == '':
+            return
+        if filename != self.output_path:
+            self.output_path = filename
+            self.output_changed.emit(filename)
         return
 
     @pyqtSlot('QString')
     def output_modified(self, value):
-        print('new output: ' + value)
+        if value != self.output_path:
+            self.output_path = value
         return
 
     @pyqtSlot(int)
     def samples_modified(self, value):
-        print('samples modified:' + value)
+        self.samples_num = value
         return
 
     @pyqtSlot(int)
     def dimension_modified(self, value):
-        print('dimension modified:' + self.sender().text())
+        sender = self.sender().objectName()
+        if sender == 'x1_dim':
+            self.dimensions[0] = value
+        elif sender == 'x2_dim':
+            self.dimensions[1] = value
+        elif sender == 'x3_dim':
+            self.dimensions[2] = value
+        elif sender == 'y_dim':
+            self.dimensions[3] = value
         return
 
     @pyqtSlot(int)
     def degree_modified(self, value):
-        print('degree modified:' + self.sender().text())
+        sender = self.sender().objectName()
+        if sender == 'x1_deg':
+            self.degrees[0] = value
+        elif sender == 'x2_deg':
+            self.degrees[1] = value
+        elif sender == 'x3_deg':
+            self.degrees[2] = value
         return
 
     @pyqtSlot(bool)
     def type_modified(self, isdown):
-        print('type: ' + self.sender().text() + ' ' + str(isdown))
+        if (isdown):
+            sender = self.sender().objectName()
+            if sender == 'radio_cheb':
+                self.type = 'chebyshev'
+            elif sender == 'radio_legend':
+                self.type = 'legendre'
+            elif sender == 'radio_lagg':
+                self.type = 'lagger'
+            elif sender == 'radio_herm':
+                self.type = 'hermit'
         return
 
     @pyqtSlot()
     def plot_clicked(self):
-        print('plot clicked')
+        if self.solution:
+            self.solution.plot()
         return
 
     @pyqtSlot()
     def exec_clicked(self):
-        print('exec clicked')
+        self.solution = None
+        self.results_field.setText('Results ' + str(np.random.randint(10)))
         return
 
+    @pyqtSlot(bool)
+    def lambda_calc_method_changed(self, isdown):
+        self.lambda_multiblock = isdown
+        return
+
+    @pyqtSlot('QString')
+    def weights_modified(self, value):
+        self.weight_method = value.lower()
+        return
+
+    def __get_params(self):
+        return dict(poly_type=self.type,degrees=self.degrees,dimentions=self.dimensions,
+                    samples=self.samples_num,input_file=self.input_path,output_file=self.output_path,
+                    weights=self.weight_method,lambda_multiblock=self.lambda_multiblock)
 
 
 
