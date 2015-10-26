@@ -7,10 +7,7 @@ import matplotlib.pyplot as plt
 n = 50
 deg = [3, 1, 2, 2]
 datas = np.matrix(read_data())
-# deg = [1,1,1,1]
-# datas = np.matrix([[32000, 32, 32, 253],
-#                    [6000, 256, 128, 199],
-#                    [16000, 32, 16,132]])
+
 degf = [sum(deg[:i + 1]) for i in range(len(deg))]
 Y_ = deepcopy(datas[:, degf[2]:degf[3]])
 
