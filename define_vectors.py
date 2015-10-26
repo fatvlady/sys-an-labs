@@ -256,9 +256,24 @@ define F_ ###########################################################3
 minY = Y_.min(axis=0)
 maxY = Y_.max(axis=0)
 F_ = np.multiply(F,maxY - minY) + minY
-fig, (ax1, ax2) = plt.subplot(1,2)
+fig, (ax1, ax2) = plt.subplots(1,2)
+ax1.set_xticks(np.arange(0,n+1,5))
+ax1.plot(np.arange(1,n+1),Y_[:,0], 'r-', label='$Y_1$')
+ax1.plot(np.arange(1,n+1),F_[:,0], 'b-', label='$F_1$')
+ax1.legend(loc='upper right', fontsize=16)
+ax1.set_title('Coordinate 1')
+ax1.grid()
 
+ax2.set_xticks(np.arange(0,n+1,5))
+ax2.plot(np.arange(1,n+1),Y_[:,1], 'r-', label='$Y_2$')
+ax2.plot(np.arange(1,n+1),F_[:,1], 'b-', label='$F_2$')
+ax2.legend(loc='upper right', fontsize=16)
+ax2.set_title('Coordinate 2')
+ax2.grid()
 
+manager = plt.get_current_fig_manager()
+manager.set_window_title('Graph')
+plt.show()
 
 '''
 define error ###########################################################3
