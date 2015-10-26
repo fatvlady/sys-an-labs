@@ -2,10 +2,15 @@ from copy import deepcopy
 from input_data import read_data
 import numpy as np
 from scipy import special
+import matplotlib.pyplot as plt
 
 n = 50
 deg = [3, 1, 2, 2]
 datas = np.matrix(read_data())
+# deg = [1,1,1,1]
+# datas = np.matrix([[32000, 32, 32, 253],
+#                    [6000, 256, 128, 199],
+#                    [16000, 32, 16,132]])
 degf = [sum(deg[:i + 1]) for i in range(len(deg))]
 Y_ = deepcopy(datas[:, degf[2]:degf[3]])
 
@@ -15,14 +20,10 @@ def norm_vector(vec):
     norm vectors value to value in [0,1]
     :return: float number in [0,1]
     '''
-
-    n, m = vec.shape
-    for j in range(m):
-        minv = np.min(vec[:, j])
-        maxv = np.max(vec[:, j])
-        for i in range(n):
-            vec[i, j] = (vec[i, j] - minv) / (maxv - minv)
-    return vec
+    minv = vec.min(axis=0)
+    maxv = vec.max(axis=0)
+    res = (vec - minv) / (maxv - minv)
+    return res
 
 
 data = norm_vector(datas)
@@ -68,7 +69,6 @@ def mA(X, p):
 
 def mX(X, p):
     '''
-
     :param X:
     :param p:
     :return: number of vectors in X
@@ -148,7 +148,7 @@ def conjugate_gradient_method(A, b, eps):
         ri1 = ri - ai * A * vi  # r i+1
         betai = -float(vi.T * A * ri1) / float(vi.T * A * vi)  # beta i
         vi1 = ri1 + betai * vi
-        if (np.linalg.norm(ri1, np.inf) < eps):
+        if (np.linalg.norm(ri1) < eps):
             break
         else:
             xi, vi, ri = xi1, vi1, ri1
@@ -252,15 +252,19 @@ F = np.matrix(F)
 '''
 define F_ ###########################################################3
 '''
-F_ = np.ndarray(shape=F.shape, dtype=float)
-for j in range(F_.shape[1]):
-    maxY_ = float(Y_[j].max(axis=1))
-    minY_ = float(Y_[j].min(axis=1))
-    for i in range(F_.shape[0]):
-        F_[i, j] = F[i, j] * (maxY_ - minY_) + minY_
+
+minY = Y_.min(axis=0)
+maxY = Y_.max(axis=0)
+F_ = np.multiply(F,maxY - minY) + minY
+fig, (ax1, ax2) = plt.subplot(1,2)
+
+
+
 '''
 define error ###########################################################3
 '''
 error = np.std(F_ - Y_, axis=0)
+#print(error)
+print(F_)
+print(Y_)
 print(error)
-print(Y_.mean(axis=0))
