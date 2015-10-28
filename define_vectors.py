@@ -12,18 +12,18 @@ degf = [sum(deg[:i + 1]) for i in range(len(deg))]
 Y_ = deepcopy(datas[:, degf[2]:degf[3]])
 
 
-def norm_vector(vec):
-    '''
-    norm vectors value to value in [0,1]
-    :return: float number in [0,1]
-    '''
-    minv = vec.min(axis=0)
-    maxv = vec.max(axis=0)
-    res = (vec - minv) / (maxv - minv)
-    return res
+def norm_vectors(v):
+    n,m = v.shape
+    vec = np.ndarray(shape=(n,m),dtype=float)
+    for j in range(m):
+        minv = np.min(v[:,j])
+        maxv = np.max(v[:,j])
+        for i in range(n):
+            vec[i,j] = (v[i,j] - minv)/(maxv - minv)
+    return np.matrix(vec)
 
 
-data = norm_vector(datas)
+data = norm_vectors(datas)
 
 X1 = data[:, :degf[0]]
 X2 = data[:, degf[0]:degf[1]]
