@@ -256,6 +256,8 @@ define F_ ###########################################################3
 minY = Y_.min(axis=0)
 maxY = Y_.max(axis=0)
 F_ = np.multiply(F,maxY - minY) + minY
+
+
 fig, (ax1, ax2) = plt.subplots(1,2)
 ax1.set_xticks(np.arange(0,n+1,5))
 ax1.plot(np.arange(1,n+1),Y_[:,0], 'r-', label='$Y_1$')
