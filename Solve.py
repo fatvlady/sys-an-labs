@@ -2,6 +2,7 @@ __author__ = 'strike'
 from copy import deepcopy
 import numpy as np
 from scipy import special
+from system_solve import *
 
 class Solve(object):
     '''
@@ -16,6 +17,7 @@ class Solve(object):
         self.p = list(map(lambda x:x+1,d['degrees'])) # on 1 more because include 0
         self.weights = d['weights']
         self.poly_type = d['poly_type']
+        self.eps = 0.000001
 
     def define_data(self):
         f = open(self.filename_input, 'r')
@@ -54,7 +56,7 @@ class Solve(object):
         self.Y = self.data[:, self.degf[2]:self.degf[3]]
 
     def built_B(self):
-        def B_average(self):
+        def B_average():
             '''
             Vector B as avarage of max and min in Y. B[i] =max Y[i,:]
             :return:
@@ -62,7 +64,7 @@ class Solve(object):
             b = np.tile((self.Y.max(axis=1) + self.Y.min(axis=1))/2,(1,self.deg[3]))
             return b
 
-        def B_scaled(self):
+        def B_scaled():
             '''
             Vector B  = Y
             :return:
@@ -82,13 +84,13 @@ class Solve(object):
         :return: function
         '''
         if self.poly_type =='chebyshev':
-            self.poly_f = special.eval_sh_chebyt()
+            self.poly_f = special.eval_sh_chebyt
         elif self.poly_type == 'legendre':
-            self.poly_f = special.eval_sh_legendre()
+            self.poly_f = special.eval_sh_legendre
         elif self.poly_type == 'lagger':
-            self.poly_f = special.eval_laguerre()
+            self.poly_f = special.eval_laguerre
         elif self.poly_type == 'hermit':
-            self.poly_f = special.eval_hermite()
+            self.poly_f = special.eval_hermite
 
     def built_A(self):
         '''
@@ -108,7 +110,6 @@ class Solve(object):
             for i in range(len(self.X)):
                 m+= self.X[i].shape[1]*(self.p[i]+1)
             return m
-
 
         def coordinate(v,deg):
             '''
@@ -131,7 +132,7 @@ class Solve(object):
             a = np.ndarray(shape=(n,0),dtype = float)
             for j in range(m):
                 for i in range(p):
-                    ch = cheb_coordinate(vec[:,j],i)
+                    ch = coordinate(vec[:,j],i)
                     a = np.append(a,ch,1)
             return a
 
@@ -140,8 +141,79 @@ class Solve(object):
         for i in range(len(self.X)):
             vec = vector(self.X[i],self.p[i])
             A = np.append(A, vec,1)
-        return A
+        self.A = np.matrix(A)
 
+    def lamb(self):
+        lamb = np.ndarray(shape = (self.A.shape[1],0), dtype = float)
+        for i in range(self.deg[3]):
+            lamb =np.append(lamb,conjugate_gradient_method(self.A.T*self.A, self.A.T*self.B[:,i],self.eps),axis = 1)
+
+        self.Lamb = np.matrix(lamb) #Lamb in full events
+
+    def psi(self):
+        def built_psi(lamb):
+            '''
+            return matrix xi1 for b1 as matrix
+            :param A:
+            :param lamb:
+            :param p:
+            :return:
+            '''
+            psi = np.ndarray(shape=(self.n, self.mX), dtype = float)
+            q = 0 #iterator in lamb and A
+            l = 0 #iterator in columns psi
+            for k in range(len(self.X)): # choose X1 or X2 or X3
+                for s in range(self.X[k].shape[1]):# choose X11 or X12 or X13
+                    for i in range(self.X[k].shape[0]):
+                            psi[i,l] = self.A[i,q:q+self.p[k]]*lamb[q:q+self.p[k], 0]
+                    q+=self.p[k]
+                    l+=1
+            return np.matrix(psi)
+
+        self.Psi = [] #as list because psi[i] is matrix(not vector)
+        for i in range(self.deg[3]):
+            self.Psi.append(built_psi(self.Lamb[:,i]))
+
+    def built_a(self):
+        self.a = np.ndarray(shape = (self.mX,0),dtype = float)
+        for i in range(self.deg[3]):
+            self.a = np.append(self.a, conjugate_gradient_method(self.Psi[i].T*self.Psi[i], self.Psi[i].T*self.Y[:,i],\
+                                                                 self.eps),axis = 1)
+
+    def built_F1i(self, psi, a):
+            '''
+            not use; it used in next function
+            :param psi: matrix psi (only one
+            :param a: vector with shape = (6,1)
+            :param degf:  = [3,4,6]//fibonachi of deg
+            :return: matrix of (three) components with F1 F2 and F3
+            '''
+            m = len(self.X) # m  = 3
+            F1i = np.ndarray(shape = (self.n,m),dtype = float)
+            k = 0 #point of begining columnt to multipy
+            for j in range(m): # 0 - 2
+                for i in range(self.n): # 0 - 49
+                    F1i[i,j] = psi[i,k:self.degf[j]]*a[k:self.degf[j],0]
+                k = self.degf[j]
+            return np.matrix(F1i)
+
+    def built_Fi(self):
+        self.Fi = []
+        for i in range(self.deg[3]):
+            self.Fi.append(self.built_F1i(self.Psi[i],self.a[:,i]))
+
+    def built_c(self):
+        self.c = np.ndarray(shape = (len(self.X),0),dtype = float)
+        for i in range(self.deg[3]):
+            self.c = np.append(self.c, conjugate_gradient_method(self.Fi[i].T*self.Fi[i], self.Fi[i].T*self.Y[:,i],self.eps),\
+                          axis = 1)
+
+    def built_F(self):
+        F = np.ndarray(self.Y.shape, dtype = float)
+        for j in range(F.shape[1]):#2
+            for i in range(F.shape[0]): #50
+                F[i,j] = self.Fi[j][i,:]*self.c[:,j]
+        self.F = np.matrix(F)
 
 
 a= Solve({'samples': 50, 'input_file': 'data.txt', 'dimentions': [3, 1, 2, 2], 'output_file': '', 'degrees': [3, 3, 3],
@@ -149,11 +221,21 @@ a= Solve({'samples': 50, 'input_file': 'data.txt', 'dimentions': [3, 1, 2, 2], '
 a.define_data()
 a.norm_data()
 a.define_norm_vectors()
-a.built_B(
+a.built_B()
 a.poly_func()
+a.built_A()
+a.lamb()
+a.psi()
+a.built_a()
+a.built_Fi()
+a.built_c()
+a.built_F()
+print(np.linalg.norm(a.F - a.Y))
 
 
-print(a.B_average())
+
+
+
 
 
 
