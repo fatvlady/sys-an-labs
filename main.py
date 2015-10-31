@@ -36,8 +36,8 @@ class MainWindow(QDialog, form_class):
         self.setupUi(self)
 
         # other initializations
-        self.dimensions = [self.x1_dim.value(), self.x2_dim.value(),
-                                    self.x3_dim.value(), self.y_dim.value()]
+        self.dimensions = np.array([self.x1_dim.value(), self.x2_dim.value(),
+                                    self.x3_dim.value(), self.y_dim.value()])
         self.degrees = np.array([self.x1_deg.value(), self.x2_deg.value(), self.x3_deg.value()])
         self.type = 'null'
         if self.radio_cheb.isChecked():
@@ -164,4 +164,3 @@ form = MainWindow()
 form.setWindowTitle('System Analysis - Lab 2')
 form.show()
 sys.exit(app.exec_())
-
