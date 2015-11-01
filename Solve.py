@@ -6,12 +6,12 @@ from system_solve import *
 
 class Solve(object):
     '''
-    {'samples': 50, 'input_file': '', 'dimentions': array([3, 1, 2, 2]), 'output_file': '', 'degrees': array([3, 3, 3]),
+    {'samples': 50, 'input_file': '', 'dimensions': array([3, 1, 2, 2]), 'output_file': '', 'degrees': array([3, 3, 3]),
      'lambda_multiblock': False, 'weights': 'average', 'poly_type': 'chebyshev'}
     '''
     def __init__(self,d):
         self.n = d['samples']
-        self.deg = d['dimentions']
+        self.deg = d['dimensions']
         self.filename_input = d['input_file']
         self.dict = d['output_file']
         self.p = list(map(lambda x:x+1,d['degrees'])) # on 1 more because include 0
@@ -55,6 +55,8 @@ class Solve(object):
         # matrix, that consists of i.e. Y1,Y2
         self.Y = self.data[:, self.degf[2]:self.degf[3]]
         self.Y_ = self.datas[:, self.degf[2]:self.degf[3]]
+        self.X_ = [self.data[:,:self.degf[0]], self.data[:,self.degf[0]:self.degf[1]],
+                   self.data[:,self.degf[1]:self.degf[2]]]
 
     def built_B(self):
         def B_average():
@@ -221,9 +223,20 @@ class Solve(object):
         maxY = self.Y_.max(axis=0)
         self.F_ = np.multiply(self.F,maxY - minY) + minY
 
-
-
-
+    def prepare(self):
+        self.define_data()
+        self.norm_data()
+        self.define_norm_vectors()
+        self.built_B()
+        self.poly_func()
+        self.built_A()
+        self.lamb()
+        self.psi()
+        self.built_a()
+        self.built_Fi()
+        self.built_c()
+        self.built_F()
+        self.built_F_()
 
 
 

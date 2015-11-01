@@ -3,10 +3,10 @@ import numpy as np
 
 def conjugate_gradient_method(A, b, eps):
     '''
-    Conjugate Gradient Method that solve equation Ax = b with given accurancy
+    Conjugate Gradient Method that solve equation Ax = b with given accuracy
     :param A:matrix A
     :param b:vector b
-    :param eps: accurancy
+    :param eps: accuracy
     :return: solution x
     '''
     n = len(A.T) # number column

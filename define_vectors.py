@@ -280,7 +280,7 @@ plt.show()
 '''
 define error ###########################################################3
 '''
-error = np.std(F_ - Y_, axis=0)
+error = np.linalg.norm(F_ - Y_)
 #print(error)
 print(F_)
 print(Y_)

@@ -25,6 +25,10 @@ class PolynomialBuilder(object):
             self.basis = b_gen.basis_hermite(max_degree)
         self.a = solution.a.T.tolist()
         self.c = solution.c.T.tolist()
+        self.minX = [X.min(axis=0) for X in solution.X_]
+        self.maxX = [X.max(axis=0) for X in solution.X_]
+        self.minY = solution.Y_.min(axis=0)
+        self.maxY = solution.Y_.max(axis=0)
 
     def _form_psi(self):
         """
@@ -121,6 +125,26 @@ class PolynomialBuilder(object):
         strings.append('\n' + str(constant))
         return ' +\n'.join(strings)
 
+    def _print_F_i_transformed_denormed(self, i):
+        """
+        Returns string of F function in special polynomial form
+        :param i: an index for Y
+        :return: result string
+        """
+        strings = list()
+        constant = 0
+        for j in range(3):
+            for k in range(len(self.psi[i][j])):
+                shift = sum(self._solution.deg[:j]) + k
+                current_poly = np.poly1d(self._transform_to_standard(self.c[i][j] * self.a[i][shift] *
+                                                                      self.psi[i][j][k]),
+                                         variable='x[{0},{1}]'.format(j + 1, k + 1))
+                constant += current_poly[current_poly.order]
+                current_poly[current_poly.order] = 0
+                strings.append(str(current_poly))
+        strings.append('\n' + str(constant))
+        return ' +\n'.join(strings)
+
     def get_results(self):
         """
         Generates results based on given solution
@@ -134,24 +158,28 @@ class PolynomialBuilder(object):
         phi_strings = ['Phi({0})([{1}])={result}\n'.format(i + 1,j + 1,result=self._print_phi_i_j(i,j))
                        for i in range(self._solution.Y.shape[1])
                        for j in range(3)]
-        F_strings = ['F({0})={result}\n'.format(i + 1,result=self._print_F_i(i))
+        f_strings = ['F({0})={result}\n'.format(i + 1,result=self._print_F_i(i))
                        for i in range(self._solution.Y.shape[1])]
-        F_strings_transformed = ['F({0}) transformed:\n{result}\n'.format(i + 1,result=self._print_F_i_transformed(i))
+        f_strings_transformed = ['F({0}) transformed:\n{result}\n'.format(i + 1,result=self._print_F_i_transformed(i))
                        for i in range(self._solution.Y.shape[1])]
-        return '\n'.join(psi_strings + phi_strings + F_strings + F_strings_transformed)
+        f_strings_transformed_denormed = ['F({0}) transformed ' \
+                                          'denormed:\n{result}\n'.format(i + 1,result=
+        self._print_F_i_transformed_denormed(i))
+                       for i in range(self._solution.Y.shape[1])]
+        return '\n'.join(psi_strings + phi_strings + f_strings + f_strings_transformed + f_strings_transformed_denormed)
 
     def plot_graphs(self):
         fig, (ax1, ax2) = plt.subplots(1,2)
         ax1.set_xticks(np.arange(0,self._solution.n+1,5))
-        ax1.plot(np.arange(1,self._solution.n+1),self._solution.Y[:,0], 'r-', label='$Y_1$')
-        ax1.plot(np.arange(1,self._solution.n+1),self._solution.F[:,0], 'b-', label='$F_1$')
+        ax1.plot(np.arange(1,self._solution.n+1),self._solution.Y_[:,0], 'r-', label='$Y_1$')
+        ax1.plot(np.arange(1,self._solution.n+1),self._solution.F_[:,0], 'b-', label='$F_1$')
         ax1.legend(loc='upper right', fontsize=16)
         ax1.set_title('Coordinate 1')
         ax1.grid()
 
         ax2.set_xticks(np.arange(0,self._solution.n+1,5))
-        ax2.plot(np.arange(1,self._solution.n+1),self._solution.Y[:,1], 'r-', label='$Y_2$')
-        ax2.plot(np.arange(1,self._solution.n+1),self._solution.F[:,1], 'b-', label='$F_2$')
+        ax2.plot(np.arange(1,self._solution.n+1),self._solution.Y_[:,1], 'r-', label='$Y_2$')
+        ax2.plot(np.arange(1,self._solution.n+1),self._solution.F_[:,1], 'b-', label='$F_2$')
         ax2.legend(loc='upper right', fontsize=16)
         ax2.set_title('Coordinate 2')
         ax2.grid()

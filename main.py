@@ -136,28 +136,23 @@ class MainWindow(QDialog, form_class):
     @pyqtSlot()
     def plot_clicked(self):
         if self.solution:
-            self.solution.plot_graphs()
+            try:
+                self.solution.plot_graphs()
+            except Exception as e:
+                QMessageBox.warning(self,'Error!','Error happened during plotting: ' + str(e))
         return
 
     @pyqtSlot()
     def exec_clicked(self):
         self.exec_button.setEnabled(False)
-        solver = Solve(self.__get_params())
-        solver.define_data()
-        solver.norm_data()
-        solver.define_norm_vectors()
-        solver.built_B()
-        solver.poly_func()
-        solver.built_A()
-        solver.lamb()
-        solver.psi()
-        solver.built_a()
-        solver.built_Fi()
-        solver.built_c()
-        solver.built_F()
-        self.solution = PolynomialBuilder(solver)
-        self.results_field.setText(self.solution.get_results())
-        self.exec_button.setEnabled(True)
+        try:
+            solver = Solve(self.__get_params())
+            solver.prepare()
+            self.solution = PolynomialBuilder(solver)
+            self.results_field.setText(self.solution.get_results())
+            self.exec_button.setEnabled(True)
+        except Exception as e:
+            QMessageBox.warning(self,'Error!','Error happened during execution: ' + str(e))
         return
 
     @pyqtSlot(bool)
