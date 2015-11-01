@@ -1,7 +1,7 @@
 from Solve import Solve
 import basis_generator as b_gen
 import numpy as np
-from numpy.polynomial import Polynomial
+import matplotlib.pyplot as plt
 
 __author__ = 'vlad'
 
@@ -118,25 +118,46 @@ class PolynomialBuilder(object):
                 constant += current_poly[current_poly.order]
                 current_poly[current_poly.order] = 0
                 strings.append(str(current_poly))
-        strings.append(str(constant))
+        strings.append('\n' + str(constant))
         return ' +\n'.join(strings)
 
+    def get_results(self):
+        """
+        Generates results based on given solution
+        :return: Results string
+        """
+        self._form_psi()
+        psi_strings = ['Psi({0})([{1},{2}])={result}\n'.format(i + 1, j + 1, k + 1, result=self._print_psi_i_jk(i,j,k))
+                       for i in range(self._solution.Y.shape[1])
+                       for j in range(3)
+                       for k in range(self._solution.deg[j])]
+        phi_strings = ['Phi({0})([{1}])={result}\n'.format(i + 1,j + 1,result=self._print_phi_i_j(i,j))
+                       for i in range(self._solution.Y.shape[1])
+                       for j in range(3)]
+        F_strings = ['F({0})={result}\n'.format(i + 1,result=self._print_F_i(i))
+                       for i in range(self._solution.Y.shape[1])]
+        F_strings_transformed = ['F({0}) transformed:\n{result}\n'.format(i + 1,result=self._print_F_i_transformed(i))
+                       for i in range(self._solution.Y.shape[1])]
+        return '\n'.join(psi_strings + phi_strings + F_strings + F_strings_transformed)
 
-a = Solve({'samples': 50, 'input_file': 'data.txt', 'dimensions': [3, 1, 2, 2], 'output_file': '', 'degrees': [7, 7, 4],
-           'lambda_multiblock': False, 'weights': 'average', 'poly_type': 'chebyshev'})
-a.define_data()
-a.norm_data()
-a.define_norm_vectors()
-a.built_B()
-a.poly_func()
-a.built_A()
-a.lamb()
-a.psi()
-a.built_a()
-a.built_Fi()
-a.built_c()
-a.built_F()
-b = PolynomialBuilder(a)
-b._form_psi()
-res = b._print_F_i_transformed(0)
-print(res)
+    def plot_graphs(self):
+        fig, (ax1, ax2) = plt.subplots(1,2)
+        ax1.set_xticks(np.arange(0,self._solution.n+1,5))
+        ax1.plot(np.arange(1,self._solution.n+1),self._solution.Y[:,0], 'r-', label='$Y_1$')
+        ax1.plot(np.arange(1,self._solution.n+1),self._solution.F[:,0], 'b-', label='$F_1$')
+        ax1.legend(loc='upper right', fontsize=16)
+        ax1.set_title('Coordinate 1')
+        ax1.grid()
+
+        ax2.set_xticks(np.arange(0,self._solution.n+1,5))
+        ax2.plot(np.arange(1,self._solution.n+1),self._solution.Y[:,1], 'r-', label='$Y_2$')
+        ax2.plot(np.arange(1,self._solution.n+1),self._solution.F[:,1], 'b-', label='$F_2$')
+        ax2.legend(loc='upper right', fontsize=16)
+        ax2.set_title('Coordinate 2')
+        ax2.grid()
+        
+        manager = plt.get_current_fig_manager()
+        manager.set_window_title('Graph')
+        plt.show()
+
+

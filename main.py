@@ -3,9 +3,11 @@ __author__ = 'vlad'
 
 import sys
 import numpy as np
+from presentation import PolynomialBuilder
+from Solve import Solve
 
 from PyQt5.QtCore import pyqtSlot, pyqtSignal, Qt
-from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog
+from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog, QMessageBox
 from PyQt5.uic import loadUiType
 
 app = QApplication(sys.argv)
@@ -45,7 +47,7 @@ class MainWindow(QDialog, form_class):
         elif self.radio_legend.isChecked():
             self.type = 'legendre'
         elif self.radio_lagg.isChecked():
-            self.type = 'lagger'
+            self.type = 'laguerre'
         elif self.radio_herm.isChecked():
             self.type = 'hermit'
         self.input_path = ''
@@ -126,7 +128,7 @@ class MainWindow(QDialog, form_class):
             elif sender == 'radio_legend':
                 self.type = 'legendre'
             elif sender == 'radio_lagg':
-                self.type = 'lagger'
+                self.type = 'laguerre'
             elif sender == 'radio_herm':
                 self.type = 'hermit'
         return
@@ -134,13 +136,28 @@ class MainWindow(QDialog, form_class):
     @pyqtSlot()
     def plot_clicked(self):
         if self.solution:
-            self.solution.plot()
+            self.solution.plot_graphs()
         return
 
     @pyqtSlot()
     def exec_clicked(self):
-        self.solution = None
-        self.results_field.setText('Results for' + str(self.__get_params()))
+        self.exec_button.setEnabled(False)
+        solver = Solve(self.__get_params())
+        solver.define_data()
+        solver.norm_data()
+        solver.define_norm_vectors()
+        solver.built_B()
+        solver.poly_func()
+        solver.built_A()
+        solver.lamb()
+        solver.psi()
+        solver.built_a()
+        solver.built_Fi()
+        solver.built_c()
+        solver.built_F()
+        self.solution = PolynomialBuilder(solver)
+        self.results_field.setText(self.solution.get_results())
+        self.exec_button.setEnabled(True)
         return
 
     @pyqtSlot(bool)
@@ -154,7 +171,7 @@ class MainWindow(QDialog, form_class):
         return
 
     def __get_params(self):
-        return dict(poly_type=self.type, degrees=self.degrees, dimentions=self.dimensions,
+        return dict(poly_type=self.type, degrees=self.degrees, dimensions=self.dimensions,
                     samples=self.samples_num, input_file=self.input_path, output_file=self.output_path,
                     weights=self.weight_method, lambda_multiblock=self.lambda_multiblock)
 

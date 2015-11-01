@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>620</width>
+    <width>623</width>
     <height>400</height>
    </rect>
   </property>
@@ -46,7 +46,7 @@
          <item>
           <widget class="QRadioButton" name="radio_lagg">
            <property name="text">
-            <string>Lagger</string>
+            <string>Laguerre</string>
            </property>
           </widget>
          </item>
@@ -79,7 +79,7 @@
          <item row="0" column="1">
           <widget class="QSpinBox" name="x1_deg">
            <property name="value">
-            <number>3</number>
+            <number>7</number>
            </property>
           </widget>
          </item>
@@ -96,14 +96,14 @@
          <item row="2" column="1">
           <widget class="QSpinBox" name="x3_deg">
            <property name="value">
-            <number>3</number>
+            <number>4</number>
            </property>
           </widget>
          </item>
          <item row="1" column="1">
           <widget class="QSpinBox" name="x2_deg">
            <property name="value">
-            <number>3</number>
+            <number>7</number>
            </property>
           </widget>
          </item>
