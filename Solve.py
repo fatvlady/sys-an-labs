@@ -17,7 +17,7 @@ class Solve(object):
         self.p = list(map(lambda x:x+1,d['degrees'])) # on 1 more because include 0
         self.weights = d['weights']
         self.poly_type = d['poly_type']
-        self.eps = 0.000001
+        self.eps = 0.000000001
 
     def define_data(self):
         f = open(self.filename_input, 'r')
@@ -54,6 +54,7 @@ class Solve(object):
         self.mX = self.degf[2]
         # matrix, that consists of i.e. Y1,Y2
         self.Y = self.data[:, self.degf[2]:self.degf[3]]
+        self.Y_ = self.datas[:, self.degf[2]:self.degf[3]]
 
     def built_B(self):
         def B_average():
@@ -87,7 +88,7 @@ class Solve(object):
             self.poly_f = special.eval_sh_chebyt
         elif self.poly_type == 'legendre':
             self.poly_f = special.eval_sh_legendre
-        elif self.poly_type == 'lagger':
+        elif self.poly_type == 'laguerre':
             self.poly_f = special.eval_laguerre
         elif self.poly_type == 'hermit':
             self.poly_f = special.eval_hermite
@@ -215,22 +216,11 @@ class Solve(object):
                 F[i,j] = self.Fi[j][i,:]*self.c[:,j]
         self.F = np.matrix(F)
 
+    def built_F_(self):
+        minY = self.Y_.min(axis=0)
+        maxY = self.Y_.max(axis=0)
+        self.F_ = np.multiply(self.F,maxY - minY) + minY
 
-a= Solve({'samples': 50, 'input_file': 'data.txt', 'dimentions': [3, 1, 2, 2], 'output_file': '', 'degrees': [3, 3, 3],
-     'lambda_multiblock': False, 'weights': 'average', 'poly_type': 'chebyshev'})
-a.define_data()
-a.norm_data()
-a.define_norm_vectors()
-a.built_B()
-a.poly_func()
-a.built_A()
-a.lamb()
-a.psi()
-a.built_a()
-a.built_Fi()
-a.built_c()
-a.built_F()
-print(np.linalg.norm(a.F - a.Y))
 
 
 
