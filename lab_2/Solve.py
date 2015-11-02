@@ -223,12 +223,17 @@ class Solve(object):
             for i in range(F.shape[0]): #50
                 F[i,j] = self.Fi[j][i,:]*self.c[:,j]
         self.F = np.matrix(F)
-
+        self.norm_error = []
+        for i in range(self.Y.shape[1]):
+            self.norm_error.append(np.linalg.norm(self.Y[:,i] - self.F[:,i],np.inf))
 
     def built_F_(self):
         minY = self.Y_.min(axis=0)
         maxY = self.Y_.max(axis=0)
         self.F_ = np.multiply(self.F,maxY - minY) + minY
+        self.error = []
+        for i in range(self.Y_.shape[1]):
+            self.error.append(np.linalg.norm(self.Y_[:,i] - self.F_[:,i],np.inf))
 
     def save_to_file(self):
         wb = Workbook()
@@ -305,6 +310,12 @@ class Solve(object):
         for i in range(self.n):
              ws.append(l+self.F_[i].tolist()[0])
         ws.append([])
+
+        ws.append(['Error normalized (Y - F)'])
+        ws.append(l + self.norm_error)
+
+        ws.append(['Error (Y_ - F_))'])
+        ws.append(l+self.error)
 
         wb.save(self.filename_output)
     
