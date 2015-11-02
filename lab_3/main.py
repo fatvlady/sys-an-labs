@@ -9,11 +9,11 @@ from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog, QMessageBox
 from PyQt5.uic import loadUiType
 
 from lab_2.presentation import PolynomialBuilder
-from lab_2.Solve import Solve
+from lab_2.solve import Solve
 
 app = QApplication(sys.argv)
-app.setApplicationName('lab2_sa')
-form_class, base_class = loadUiType('lab_2/main_window.ui')
+app.setApplicationName('lab3_sa')
+form_class, base_class = loadUiType('lab_3/main_window.ui')
 
 
 class MainWindow(QDialog, form_class):
