@@ -28,7 +28,7 @@ def test_p(a,p1,p2,p3):
                 d.append((str(i)+' '+str(j)+' '+str(k),np.linalg.norm(a.F - a.Y)))
     return d
 
-d = test_p(a,8,8,5)
+d = test_p(a,15,15,15)
 f = open('test_p.txt','w')
 miner = d[0]
 for i in d:

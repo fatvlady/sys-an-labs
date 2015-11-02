@@ -194,6 +194,6 @@ class PolynomialBuilder(object):
         
         manager = plt.get_current_fig_manager()
         manager.set_window_title('Graph')
-        fig.show()
+        plt.show()
 
 

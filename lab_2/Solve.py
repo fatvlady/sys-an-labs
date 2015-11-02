@@ -22,6 +22,8 @@ class Solve(object):
         self.weights = d['weights']
         self.poly_type = d['poly_type']
         self.eps = 0.000000001
+        self.norm_error=0.0
+        self.error=0.0
 
     def define_data(self):
         f = open(self.filename_input, 'r')
@@ -222,6 +224,7 @@ class Solve(object):
                 F[i,j] = self.Fi[j][i,:]*self.c[:,j]
         self.F = np.matrix(F)
 
+
     def built_F_(self):
         minY = self.Y_.min(axis=0)
         maxY = self.Y_.max(axis=0)
@@ -244,12 +247,12 @@ class Solve(object):
              ws.append(l+self.datas[i,self.degf[2]:self.degf[3]].tolist()[0])
         ws.append([])
 
-        ws.append(['X normalised:'])
+        ws.append(['X normalized:'])
         for i in range(self.n):
              ws.append(l+self.data[i,:self.degf[2]].tolist()[0])
         ws.append([])
 
-        ws.append(['Y noralised:'])
+        ws.append(['Y normalized:'])
         for i in range(self.n):
              ws.append(l+self.data[i,self.degf[2]:self.degf[3]].tolist()[0])
         ws.append([])
@@ -293,9 +296,14 @@ class Solve(object):
              ws.append(l+self.c[i].tolist()[0])
         ws.append([])
 
-        ws.append(['Y rebuilt:'])
+        ws.append(['Y rebuilt normalized :'])
         for i in range(self.n):
              ws.append(l+self.F[i].tolist()[0])
+        ws.append([])
+
+        ws.append(['Y rebuilt normalized :'])
+        for i in range(self.n):
+             ws.append(l+self.F_[i].tolist()[0])
         ws.append([])
 
         wb.save(self.filename_output)
