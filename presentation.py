@@ -25,10 +25,10 @@ class PolynomialBuilder(object):
             self.basis = b_gen.basis_hermite(max_degree)
         self.a = solution.a.T.tolist()
         self.c = solution.c.T.tolist()
-        self.minX = [X.min(axis=0) for X in solution.X_]
-        self.maxX = [X.max(axis=0) for X in solution.X_]
-        self.minY = solution.Y_.min(axis=0)
-        self.maxY = solution.Y_.max(axis=0)
+        self.minX = [X.min(axis=0).getA1() for X in solution.X_]
+        self.maxX = [X.max(axis=0).getA1() for X in solution.X_]
+        self.minY = solution.Y_.min(axis=0).getA1()
+        self.maxY = solution.Y_.max(axis=0).getA1()
 
     def _form_psi(self):
         """
@@ -105,6 +105,33 @@ class PolynomialBuilder(object):
                                                                               j + 1, k + 1, symbol=self.symbol, deg=n))
         return ' + '.join(strings)
 
+    def _print_F_i_transformed_denormed(self, i):
+        """
+        Returns string of F function in special polynomial form
+        :param i: an index for Y
+        :return: result string
+        """
+        strings = list()
+        constant = 0
+        for j in range(3):
+            for k in range(len(self.psi[i][j])):
+                shift = sum(self._solution.deg[:j]) + k
+                raw_coeffs = self._transform_to_standard(self.c[i][j] * self.a[i][shift] * self.psi[i][j][k])
+                diff = self.maxX[j][k] - self.minX[j][k]
+                mult_poly = np.poly1d([1 / diff, - self.minX[j][k]] / diff)
+                add_poly = np.poly1d([1])
+                current_poly = np.poly1d([0])
+                for n in range(len(raw_coeffs)):
+                    current_poly += add_poly * raw_coeffs[n]
+                    add_poly *= mult_poly
+                current_poly = current_poly * (self.maxY[i] - self.minY[i]) + self.minY[i]
+                constant += current_poly[0]
+                current_poly[0] = 0
+                current_poly = np.poly1d(current_poly.coeffs, variable='x[{0},{1}]'.format(j + 1, k + 1))
+                strings.append(str(current_poly))
+        strings.append('\n' + str(constant))
+        return ' +\n'.join(strings)
+
     def _print_F_i_transformed(self, i):
         """
         Returns string of F function in special polynomial form
@@ -117,30 +144,10 @@ class PolynomialBuilder(object):
             for k in range(len(self.psi[i][j])):
                 shift = sum(self._solution.deg[:j]) + k
                 current_poly = np.poly1d(self._transform_to_standard(self.c[i][j] * self.a[i][shift] *
-                                                                     self.psi[i][j][k]),
+                                                                      self.psi[i][j][k])[::-1],
                                          variable='x[{0},{1}]'.format(j + 1, k + 1))
-                constant += current_poly[current_poly.order]
-                current_poly[current_poly.order] = 0
-                strings.append(str(current_poly))
-        strings.append('\n' + str(constant))
-        return ' +\n'.join(strings)
-
-    def _print_F_i_transformed_denormed(self, i):
-        """
-        Returns string of F function in special polynomial form
-        :param i: an index for Y
-        :return: result string
-        """
-        strings = list()
-        constant = 0
-        for j in range(3):
-            for k in range(len(self.psi[i][j])):
-                shift = sum(self._solution.deg[:j]) + k
-                current_poly = np.poly1d(self._transform_to_standard(self.c[i][j] * self.a[i][shift] *
-                                                                      self.psi[i][j][k]),
-                                         variable='x[{0},{1}]'.format(j + 1, k + 1))
-                constant += current_poly[current_poly.order]
-                current_poly[current_poly.order] = 0
+                constant += current_poly[0]
+                current_poly[0] = 0
                 strings.append(str(current_poly))
         strings.append('\n' + str(constant))
         return ' +\n'.join(strings)

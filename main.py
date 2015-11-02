@@ -7,6 +7,7 @@ from presentation import PolynomialBuilder
 from Solve import Solve
 
 from PyQt5.QtCore import pyqtSlot, pyqtSignal, Qt
+from PyQt5.QtGui import QTextDocument, QFont
 from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog, QMessageBox
 from PyQt5.uic import loadUiType
 
@@ -56,6 +57,13 @@ class MainWindow(QDialog, form_class):
         self.lambda_multiblock = self.lambda_check.isChecked()
         self.weight_method = self.weights_box.currentText().lower()
         self.solution = None
+        doc = self.results_field.document()
+        assert isinstance(doc, QTextDocument)
+        font = doc.defaultFont()
+        assert isinstance(font, QFont)
+        font.setFamily('Courier New')
+        font.setPixelSize(12)
+        doc.setDefaultFont(font)
         return
 
     @pyqtSlot()
@@ -150,9 +158,9 @@ class MainWindow(QDialog, form_class):
             solver.prepare()
             self.solution = PolynomialBuilder(solver)
             self.results_field.setText(self.solution.get_results())
-            self.exec_button.setEnabled(True)
         except Exception as e:
             QMessageBox.warning(self,'Error!','Error happened during execution: ' + str(e))
+        self.exec_button.setEnabled(True)
         return
 
     @pyqtSlot(bool)

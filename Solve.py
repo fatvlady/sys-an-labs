@@ -55,8 +55,8 @@ class Solve(object):
         # matrix, that consists of i.e. Y1,Y2
         self.Y = self.data[:, self.degf[2]:self.degf[3]]
         self.Y_ = self.datas[:, self.degf[2]:self.degf[3]]
-        self.X_ = [self.data[:,:self.degf[0]], self.data[:,self.degf[0]:self.degf[1]],
-                   self.data[:,self.degf[1]:self.degf[2]]]
+        self.X_ = [self.datas[:,:self.degf[0]], self.datas[:,self.degf[0]:self.degf[1]],
+                   self.datas[:,self.degf[1]:self.degf[2]]]
 
     def built_B(self):
         def B_average():
