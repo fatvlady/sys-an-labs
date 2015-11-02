@@ -1,7 +1,8 @@
-from Solve import Solve
-import basis_generator as b_gen
 import numpy as np
 import matplotlib.pyplot as plt
+
+from lab_2.Solve import Solve
+import lab_2.basis_generator as b_gen
 
 __author__ = 'vlad'
 

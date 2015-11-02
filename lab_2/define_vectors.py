@@ -1,8 +1,10 @@
 from copy import deepcopy
-from input_data import read_data
+
 import numpy as np
 from scipy import special
 import matplotlib.pyplot as plt
+
+from lab_2.input_data import read_data
 
 n = 50
 deg = [3, 1, 2, 2]

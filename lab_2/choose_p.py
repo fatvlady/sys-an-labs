@@ -1,5 +1,5 @@
 __author__ = 'strike'
-from Solve import *
+from lab_2.Solve import *
 
 a= Solve({'samples': 50, 'input_file': 'data.txt', 'dimensions': [3, 1, 2, 2], 'output_file': '', 'degrees': [3, 3, 3],
      'lambda_multiblock': False, 'weights': 'average', 'poly_type': 'chebyshev'})

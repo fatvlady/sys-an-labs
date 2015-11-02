@@ -1,9 +1,11 @@
 __author__ = 'strike'
 from copy import deepcopy
-import numpy as np
+
 from scipy import special
-from system_solve import *
 from openpyxl import Workbook
+
+from lab_2.system_solve import *
+
 
 class Solve(object):
     '''

@@ -2,18 +2,18 @@ __author__ = 'vlad'
 # coding: utf8
 
 import sys
-import numpy as np
-from presentation import PolynomialBuilder
-from Solve import Solve
 
-from PyQt5.QtCore import pyqtSlot, pyqtSignal, Qt
+from PyQt5.QtCore import pyqtSlot, pyqtSignal
 from PyQt5.QtGui import QTextDocument, QFont
 from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog, QMessageBox
 from PyQt5.uic import loadUiType
 
+from lab_2.presentation import PolynomialBuilder
+from lab_2.Solve import Solve
+
 app = QApplication(sys.argv)
 app.setApplicationName('lab2_sa')
-form_class, base_class = loadUiType('main_window.ui')
+form_class, base_class = loadUiType('lab_2/main_window.ui')
 
 
 class MainWindow(QDialog, form_class):
