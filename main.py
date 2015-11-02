@@ -84,7 +84,7 @@ class MainWindow(QDialog, form_class):
 
     @pyqtSlot()
     def output_clicked(self):
-        filename = QFileDialog.getSaveFileName(self, 'Save data file', '.', 'Data file (*.xls)')[0]
+        filename = QFileDialog.getSaveFileName(self, 'Save data file', '.', 'Spreadsheet (*.xls)')[0]
         if filename == '':
             return
         if filename != self.output_path:
