@@ -3,6 +3,7 @@ from copy import deepcopy
 import numpy as np
 from scipy import special
 from system_solve import *
+from openpyxl import Workbook
 
 class Solve(object):
     '''
@@ -13,6 +14,7 @@ class Solve(object):
         self.n = d['samples']
         self.deg = d['dimensions']
         self.filename_input = d['input_file']
+        self.filename_output = d['output_file']
         self.dict = d['output_file']
         self.p = list(map(lambda x:x+1,d['degrees'])) # on 1 more because include 0
         self.weights = d['weights']
@@ -223,6 +225,79 @@ class Solve(object):
         maxY = self.Y_.max(axis=0)
         self.F_ = np.multiply(self.F,maxY - minY) + minY
 
+    def save_to_file(self):
+        wb = Workbook()
+        #get active worksheet
+        ws = wb.active
+
+        l = [None]
+
+        ws.append(['Input data: X'])
+        for i in range(self.n):
+             ws.append(l+self.datas[i,:self.degf[3]].tolist()[0])
+        ws.append([])
+
+        ws.append(['Input data: Y'])
+        for i in range(self.n):
+             ws.append(l+self.datas[i,self.degf[2]:self.degf[3]].tolist()[0])
+        ws.append([])
+
+        ws.append(['X normalised:'])
+        for i in range(self.n):
+             ws.append(l+self.data[i,:self.degf[2]].tolist()[0])
+        ws.append([])
+
+        ws.append(['Y noralised:'])
+        for i in range(self.n):
+             ws.append(l+self.data[i,self.degf[2]:self.degf[3]].tolist()[0])
+        ws.append([])
+
+        ws.append(['matrix B:'])
+        for i in range(self.n):
+             ws.append(l+self.B[i].tolist()[0])
+        ws.append([])
+
+        ws.append(['matrix A:'])
+        for i in range(self.A.shape[0]):
+             ws.append(l+self.A[i].tolist()[0])
+        ws.append([])
+
+        ws.append(['matrix Lambda:'])
+        for i in range(self.Lamb.shape[0]):
+             ws.append(l+self.Lamb[i].tolist()[0])
+        ws.append([])
+
+        for j in range(len(self.Psi)):
+             s = 'matrix Psi%i:' %(j+1)
+             ws.append([s])
+             for i in range(self.n):
+                  ws.append(l+self.Psi[j][i].tolist()[0])
+             ws.append([])
+
+        ws.append(['matrix a:'])
+        for i in range(self.mX):
+             ws.append(l+self.a[i].tolist()[0])
+        ws.append([])
+
+        for j in range(len(self.Fi)):
+             s = 'matrix F%i:' %(j+1)
+             ws.append([s])
+             for i in range(self.Fi[j].shape[0]):
+                  ws.append(l+self.Fi[j][i].tolist()[0])
+             ws.append([])
+
+        ws.append(['matrix c:'])
+        for i in range(len(self.X)):
+             ws.append(l+self.c[i].tolist()[0])
+        ws.append([])
+
+        ws.append(['Y rebuilt:'])
+        for i in range(self.n):
+             ws.append(l+self.F[i].tolist()[0])
+        ws.append([])
+
+        wb.save(self.filename_output)
+    
     def prepare(self):
         self.define_data()
         self.norm_data()
@@ -237,6 +312,8 @@ class Solve(object):
         self.built_c()
         self.built_F()
         self.built_F_()
+        self.save_to_file()
+
 
 
 

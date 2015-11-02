@@ -39,9 +39,9 @@ class MainWindow(QDialog, form_class):
         self.setupUi(self)
 
         # other initializations
-        self.dimensions = np.array([self.x1_dim.value(), self.x2_dim.value(),
-                                    self.x3_dim.value(), self.y_dim.value()])
-        self.degrees = np.array([self.x1_deg.value(), self.x2_deg.value(), self.x3_deg.value()])
+        self.dimensions = [self.x1_dim.value(), self.x2_dim.value(),
+                                    self.x3_dim.value(), self.y_dim.value()]
+        self.degrees = [self.x1_deg.value(), self.x2_deg.value(), self.x3_deg.value()]
         self.type = 'null'
         if self.radio_cheb.isChecked():
             self.type = 'chebyshev'
@@ -84,7 +84,7 @@ class MainWindow(QDialog, form_class):
 
     @pyqtSlot()
     def output_clicked(self):
-        filename = QFileDialog.getSaveFileName(self, 'Save data file', '.', 'Data file (*.txt)')[0]
+        filename = QFileDialog.getSaveFileName(self, 'Save data file', '.', 'Data file (*.xls)')[0]
         if filename == '':
             return
         if filename != self.output_path:
