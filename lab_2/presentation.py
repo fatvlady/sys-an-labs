@@ -177,20 +177,20 @@ class PolynomialBuilder(object):
         return '\n'.join(psi_strings + phi_strings + f_strings + f_strings_transformed + f_strings_transformed_denormed)
 
     def plot_graphs(self):
-        fig, (ax1, ax2) = plt.subplots(1,2)
-        ax1.set_xticks(np.arange(0,self._solution.n+1,5))
-        ax1.plot(np.arange(1,self._solution.n+1),self._solution.Y_[:,0], 'r-', label='$Y_1$')
-        ax1.plot(np.arange(1,self._solution.n+1),self._solution.F_[:,0], 'b-', label='$F_1$')
-        ax1.legend(loc='upper right', fontsize=16)
-        ax1.set_title('Coordinate 1')
-        ax1.grid()
-
-        ax2.set_xticks(np.arange(0,self._solution.n+1,5))
-        ax2.plot(np.arange(1,self._solution.n+1),self._solution.Y_[:,1], 'r-', label='$Y_2$')
-        ax2.plot(np.arange(1,self._solution.n+1),self._solution.F_[:,1], 'b-', label='$F_2$')
-        ax2.legend(loc='upper right', fontsize=16)
-        ax2.set_title('Coordinate 2')
-        ax2.grid()
+        fig, axes = plt.subplots(1,self._solution.Y.shape[1])
+        if not isinstance(axes, np.ndarray):
+            axes = np.array([axes])
+        index = 0
+        for ax in axes:
+            index += 1
+            ax.set_xticks(np.arange(0,self._solution.n+1,5))
+            ax.plot(np.arange(1,self._solution.n+1),self._solution.Y_[:,index - 1],
+                    'r-', label='$Y_{0}$'.format(index))
+            ax.plot(np.arange(1,self._solution.n+1),self._solution.F_[:,index - 1],
+                    'b-', label='$F_{0}$'.format(index))
+            ax.legend(loc='upper right', fontsize=16)
+            ax.set_title('Coordinate {0}'.format(index))
+            ax.grid()
         
         manager = plt.get_current_fig_manager()
         manager.set_window_title('Graph')
