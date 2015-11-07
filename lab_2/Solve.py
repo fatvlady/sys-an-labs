@@ -21,6 +21,7 @@ class Solve(object):
         self.p = list(map(lambda x:x+1,d['degrees'])) # on 1 more because include 0
         self.weights = d['weights']
         self.poly_type = d['poly_type']
+        self.splitted_lambdas = d['lambda_multiblock']
         self.eps = 0.000000001
         self.norm_error=0.0
         self.error=0.0
@@ -31,6 +32,15 @@ class Solve(object):
         self.datas = np.matrix([list(map(lambda x:float(x),f.readline().split())) for i in range(self.n)])
         # list of sum degrees [ 3,1,2] -> [3,4,6]
         self.degf = [sum(self.deg[:i + 1]) for i in range(len(self.deg))]
+
+    def _minimize_equation(self, A, b):
+        """
+        Finds such vector x that |Ax-b|->min.
+        :param A: Matrix A
+        :param b: Vector b
+        :return: Vector x
+        """
+        return conjugate_gradient_method(A.T*A, A.T*b, self.eps)
 
     def norm_data(self):
         '''
@@ -155,8 +165,15 @@ class Solve(object):
     def lamb(self):
         lamb = np.ndarray(shape = (self.A.shape[1],0), dtype = float)
         for i in range(self.deg[3]):
-            lamb =np.append(lamb,conjugate_gradient_method(self.A.T*self.A, self.A.T*self.B[:,i],self.eps),axis = 1)
-
+            if self.splitted_lambdas:
+                boundary_1 = self.p[0] * self.deg[0]
+                boundary_2 = self.p[1] * self.deg[1] + boundary_1
+                lamb1 = self._minimize_equation(self.A[:, :boundary_1], self.B[:, i])
+                lamb2 = self._minimize_equation(self.A[:, boundary_1:boundary_2], self.B[:, i])
+                lamb3 = self._minimize_equation(self.A[:, boundary_2:], self.B[:, i])
+                lamb = np.append(lamb, np.concatenate((lamb1, lamb2, lamb3)), axis=1)
+            else:
+                lamb = np.append(lamb, self._minimize_equation(self.A, self.B[:, i]), axis=1)
         self.Lamb = np.matrix(lamb) #Lamb in full events
 
     def psi(self):
@@ -184,7 +201,7 @@ class Solve(object):
             self.Psi.append(built_psi(self.Lamb[:,i]))
 
     def built_a(self):
-        self.a = np.ndarray(shape = (self.mX,0),dtype = float)
+        self.a = np.ndarray(shape=(self.mX,0), dtype=float)
         for i in range(self.deg[3]):
             self.a = np.append(self.a, conjugate_gradient_method(self.Psi[i].T*self.Psi[i], self.Psi[i].T*self.Y[:,i],\
                                                                  self.eps),axis = 1)
@@ -334,9 +351,3 @@ class Solve(object):
         self.built_F()
         self.built_F_()
         self.save_to_file()
-
-
-
-
-
-
