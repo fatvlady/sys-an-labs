@@ -183,7 +183,7 @@ class Solve(object):
             :param A:
             :param lamb:
             :param p:
-            :return:
+            :return: matrix psi, for each Y
             '''
             psi = np.ndarray(shape=(self.n, self.mX), dtype = float)
             q = 0 #iterator in lamb and A
