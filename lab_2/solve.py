@@ -8,10 +8,7 @@ from lab_2.system_solve import *
 
 
 class Solve(object):
-    '''
-    {'samples': 50, 'input_file': '', 'dimensions': array([3, 1, 2, 2]), 'output_file': '', 'degrees': array([3, 3, 3]),
-     'lambda_multiblock': False, 'weights': 'average', 'poly_type': 'chebyshev'}
-    '''
+
     def __init__(self,d):
         self.n = d['samples']
         self.deg = d['dimensions']
