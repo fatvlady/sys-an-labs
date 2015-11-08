@@ -12,8 +12,8 @@ from lab_2.presentation import PolynomialBuilder
 from lab_2.solve import Solve
 
 app = QApplication(sys.argv)
-app.setApplicationName('lab2_sa')
-form_class, base_class = loadUiType('lab_2/main_window.ui')
+app.setApplicationName('lab3_sa')
+form_class, base_class = loadUiType('lab_3/main_window.ui')
 
 
 class MainWindow(QDialog, form_class):
@@ -181,6 +181,6 @@ class MainWindow(QDialog, form_class):
 
 # -----------------------------------------------------#
 form = MainWindow()
-form.setWindowTitle('System Analysis - Lab 2')
+form.setWindowTitle('System Analysis - Lab 3')
 form.show()
 sys.exit(app.exec_())
