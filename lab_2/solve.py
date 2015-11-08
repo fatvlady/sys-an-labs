@@ -19,7 +19,7 @@ class Solve(object):
         self.weights = d['weights']
         self.poly_type = d['poly_type']
         self.splitted_lambdas = d['lambda_multiblock']
-        self.eps = 0.000000001
+        self.eps = 1E-9
         self.norm_error=0.0
         self.error=0.0
 
@@ -30,14 +30,17 @@ class Solve(object):
         # list of sum degrees [ 3,1,2] -> [3,4,6]
         self.degf = [sum(self.deg[:i + 1]) for i in range(len(self.deg))]
 
-    def _minimize_equation(self, A, b):
+    def _minimize_equation(self, A, b, type='cjg'):
         """
         Finds such vector x that |Ax-b|->min.
         :param A: Matrix A
         :param b: Vector b
         :return: Vector x
         """
-        return conjugate_gradient_method(A.T*A, A.T*b, self.eps)
+        if type == 'lsq':
+            return np.linalg.lstsq(A,b)[0]
+        elif type == 'cjg':
+            return conjugate_gradient_method(A.T*A, A.T*b, self.eps)
 
     def norm_data(self):
         '''
@@ -200,8 +203,10 @@ class Solve(object):
     def built_a(self):
         self.a = np.ndarray(shape=(self.mX,0), dtype=float)
         for i in range(self.deg[3]):
-            self.a = np.append(self.a, conjugate_gradient_method(self.Psi[i].T*self.Psi[i], self.Psi[i].T*self.Y[:,i],\
-                                                                 self.eps),axis = 1)
+            a1 = self._minimize_equation(self.Psi[i][:, :self.degf[0]], self.Y[:, i])
+            a2 = self._minimize_equation(self.Psi[i][:, self.degf[0]:self.degf[1]], self.Y[:, i])
+            a3 = self._minimize_equation(self.Psi[i][:, self.degf[1]:], self.Y[:, i])
+            self.a = np.append(self.a, np.vstack((a1, a2, a3)),axis = 1)
 
     def built_F1i(self, psi, a):
             '''
