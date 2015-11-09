@@ -4,7 +4,7 @@ from copy import deepcopy
 from scipy import special
 from openpyxl import Workbook
 
-from lab_2.system_solve import *
+from lab_3.system_solve import *
 
 
 class Solve(object):
@@ -30,7 +30,7 @@ class Solve(object):
         # list of sum degrees [ 3,1,2] -> [3,4,6]
         self.degf = [sum(self.deg[:i + 1]) for i in range(len(self.deg))]
 
-    def _minimize_equation(self, A, b, type='cjg'):
+    def _minimize_equation(self, A, b, type='lsq'):
         """
         Finds such vector x that |Ax-b|->min.
         :param A: Matrix A
@@ -207,8 +207,8 @@ class Solve(object):
             a2 = self._minimize_equation(self.Psi[i][:, self.degf[0]:self.degf[1]], self.Y[:, i])
             a3 = self._minimize_equation(self.Psi[i][:, self.degf[1]:], self.Y[:, i])
             # temp = self._minimize_equation(self.Psi[i], self.Y[:, i])
-            # self.a = np.append(self.a, temp)
-            self.a = np.append(self.a, np.vstack((a1, a2, a3)),axis = 1)
+            # self.a = np.append(self.a, temp, axis=1)
+            self.a = np.append(self.a, np.vstack((a1, a2, a3)), axis=1)
 
     def built_F1i(self, psi, a):
             '''
@@ -220,7 +220,7 @@ class Solve(object):
             '''
             m = len(self.X) # m  = 3
             F1i = np.ndarray(shape = (self.n,m),dtype = float)
-            k = 0 #point of begining columnt to multipy
+            k = 0 # point of begining columnt to multipy
             for j in range(m): # 0 - 2
                 for i in range(self.n): # 0 - 49
                     F1i[i,j] = psi[i,k:self.degf[j]]*a[k:self.degf[j],0]

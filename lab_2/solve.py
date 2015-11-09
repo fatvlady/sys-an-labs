@@ -207,7 +207,7 @@ class Solve(object):
             a2 = self._minimize_equation(self.Psi[i][:, self.degf[0]:self.degf[1]], self.Y[:, i])
             a3 = self._minimize_equation(self.Psi[i][:, self.degf[1]:], self.Y[:, i])
             # temp = self._minimize_equation(self.Psi[i], self.Y[:, i])
-            # self.a = np.append(self.a, temp)
+            # self.a = np.append(self.a, temp, axis=1)
             self.a = np.append(self.a, np.vstack((a1, a2, a3)),axis = 1)
 
     def built_F1i(self, psi, a):

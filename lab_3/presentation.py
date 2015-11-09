@@ -1,8 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from lab_2.solve import Solve
-import lab_2.basis_generator as b_gen
+from lab_3.solve import Solve
+import lab_3.basis_generator as b_gen
 
 __author__ = 'vlad'
 
