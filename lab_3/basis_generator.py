@@ -37,3 +37,7 @@ def basis_laguerre(degree):
         basis.append(pm([2*i + 1, -1])*basis[-1] - i * i * basis[-2])
     return basis
 
+def basis_chebyshev(degree):
+    basis = [pm([1])]
+
+    return basis

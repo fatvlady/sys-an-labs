@@ -189,7 +189,7 @@
       <item row="0" column="1">
        <widget class="QSpinBox" name="x1_dim">
         <property name="value">
-         <number>3</number>
+         <number>2</number>
         </property>
        </widget>
       </item>
@@ -206,7 +206,7 @@
       <item row="3" column="1">
        <widget class="QSpinBox" name="y_dim">
         <property name="value">
-         <number>2</number>
+         <number>4</number>
         </property>
        </widget>
       </item>
@@ -233,14 +233,14 @@
       <item row="1" column="1">
        <widget class="QSpinBox" name="x2_dim">
         <property name="value">
-         <number>1</number>
+         <number>2</number>
         </property>
        </widget>
       </item>
       <item row="2" column="1">
        <widget class="QSpinBox" name="x3_dim">
         <property name="value">
-         <number>2</number>
+         <number>3</number>
         </property>
        </widget>
       </item>
@@ -303,12 +303,15 @@
          <number>999</number>
         </property>
         <property name="value">
-         <number>50</number>
+         <number>45</number>
         </property>
        </widget>
       </item>
       <item row="1" column="0">
        <widget class="QLineEdit" name="line_input">
+        <property name="text">
+         <string>data_u.txt</string>
+        </property>
         <property name="placeholderText">
          <string>Input file</string>
         </property>
@@ -323,6 +326,9 @@
       </item>
       <item row="2" column="0">
        <widget class="QLineEdit" name="line_output">
+        <property name="text">
+         <string>a.xlsx</string>
+        </property>
         <property name="placeholderText">
          <string>Output file</string>
         </property>

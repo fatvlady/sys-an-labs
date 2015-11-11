@@ -38,10 +38,10 @@ class MainWindow(QDialog, form_class):
             self.type = 'sh_cheb_doubled'
         elif self.radio_cheb.isChecked():
             self.type = 'cheb'
-        elif self.radio_lagg.isChecked():
+        elif self.radio_sh_cheb_2.isChecked():
             self.type = 'sh_cheb_2'
-        self.input_path = ''
-        self.output_path = ''
+        self.input_path = self.line_input.text()
+        self.output_path = self.line_output.text()
         self.samples_num = self.sample_spin.value()
         self.lambda_multiblock = self.lambda_check.isChecked()
         self.weight_method = self.weights_box.currentText().lower()
@@ -53,7 +53,6 @@ class MainWindow(QDialog, form_class):
         font.setFamily('Courier New')
         font.setPixelSize(12)
         doc.setDefaultFont(font)
-
         return
 
     @pyqtSlot()
@@ -121,14 +120,12 @@ class MainWindow(QDialog, form_class):
     def type_modified(self, isdown):
         if (isdown):
             sender = self.sender().objectName()
-            if sender == 'radio_cheb':
-                self.type = 'chebyshev'
-            elif sender == 'radio_legend':
-                self.type = 'legendre'
-            elif sender == 'radio_lagg':
-                self.type = 'laguerre'
-            elif sender == 'radio_herm':
-                self.type = 'hermit'
+            if sender == 'radio_sh_cheb':
+                self.type = 'sh_cheb_doubled'
+            elif sender == 'radio_cheb':
+                self.type = 'cheb'
+            elif sender == 'radio_sh_cheb_2':
+                self.type = 'sh_cheb_2'
         return
 
     @pyqtSlot()

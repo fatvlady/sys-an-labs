@@ -11,19 +11,16 @@ class PolynomialBuilder(object):
     def __init__(self, solution):
         assert isinstance(solution, Solve)
         self._solution = solution
-        max_degree = max(solution.p) - 1
-        if solution.poly_type == 'chebyshev':
+        max_degree = max(solution.deg) - 1
+        if solution.poly_type == 'sh_cheb_doubled':
             self.symbol = 'T'
             self.basis = b_gen.basis_sh_chebyshev(max_degree)
-        elif solution.poly_type == 'legendre':
+        elif solution.poly_type == 'cheb':
             self.symbol = 'P'
             self.basis = b_gen.basis_sh_legendre(max_degree)
-        elif solution.poly_type == 'laguerre':
+        elif solution.poly_type == 'sh_cheb_2':
             self.symbol = 'L'
             self.basis = b_gen.basis_laguerre(max_degree)
-        elif solution.poly_type == 'hermit':
-            self.symbol = 'H'
-            self.basis = b_gen.basis_hermite(max_degree)
         self.a = solution.a.T.tolist()
         self.c = solution.c.T.tolist()
         self.minX = [X.min(axis=0).getA1() for X in solution.X_]
@@ -41,9 +38,9 @@ class PolynomialBuilder(object):
             shift = 0
             for j in range(3):  # `j` is an index to choose vector from X
                 psi_i_j = list()
-                for k in range(self._solution.deg[j]):  # `k` is an index for vector component
-                    psi_i_jk = self._solution.Lamb[shift:shift + self._solution.p[j], i].getA1()
-                    shift += self._solution.p[j]
+                for k in range(self._solution.dim[j]):  # `k` is an index for vector component
+                    psi_i_jk = self._solution.Lamb[shift:shift + self._solution.deg[j], i].getA1()
+                    shift += self._solution.deg[j]
                     psi_i_j.append(psi_i_jk)
                 psi_i.append(psi_i_j)
             self.psi.append(psi_i)
@@ -84,7 +81,7 @@ class PolynomialBuilder(object):
         """
         strings = list()
         for k in range(len(self.psi[i][j])):
-            shift = sum(self._solution.deg[:j]) + k
+            shift = sum(self._solution.dim[:j]) + k
             for n in range(len(self.psi[i][j][k])):
                 strings.append('{0:.6f}*{symbol}{deg}(x[{1},{2}])'.format(self.a[i][shift]*self.psi[i][j][k][n],
                                                                           j + 1, k + 1, symbol=self.symbol, deg=n))
@@ -99,7 +96,7 @@ class PolynomialBuilder(object):
         strings = list()
         for j in range(3):
             for k in range(len(self.psi[i][j])):
-                shift = sum(self._solution.deg[:j]) + k
+                shift = sum(self._solution.dim[:j]) + k
                 for n in range(len(self.psi[i][j][k])):
                     strings.append('{0:.6f}*{symbol}{deg}(x[{1},{2}])'.format(self.c[i][j] * self.a[i][shift] *
                                                                               self.psi[i][j][k][n],
@@ -116,7 +113,7 @@ class PolynomialBuilder(object):
         constant = 0
         for j in range(3):
             for k in range(len(self.psi[i][j])):
-                shift = sum(self._solution.deg[:j]) + k
+                shift = sum(self._solution.dim[:j]) + k
                 raw_coeffs = self._transform_to_standard(self.c[i][j] * self.a[i][shift] * self.psi[i][j][k])
                 diff = self.maxX[j][k] - self.minX[j][k]
                 mult_poly = np.poly1d([1 / diff, - self.minX[j][k]] / diff)
@@ -143,7 +140,7 @@ class PolynomialBuilder(object):
         constant = 0
         for j in range(3):
             for k in range(len(self.psi[i][j])):
-                shift = sum(self._solution.deg[:j]) + k
+                shift = sum(self._solution.dim[:j]) + k
                 current_poly = np.poly1d(self._transform_to_standard(self.c[i][j] * self.a[i][shift] *
                                                                       self.psi[i][j][k])[::-1],
                                          variable='x[{0},{1}]'.format(j + 1, k + 1))
@@ -162,7 +159,7 @@ class PolynomialBuilder(object):
         psi_strings = ['Psi({0})([{1},{2}])={result}\n'.format(i + 1, j + 1, k + 1, result=self._print_psi_i_jk(i,j,k))
                        for i in range(self._solution.Y.shape[1])
                        for j in range(3)
-                       for k in range(self._solution.deg[j])]
+                       for k in range(self._solution.dim[j])]
         phi_strings = ['Phi({0})([{1}])={result}\n'.format(i + 1,j + 1,result=self._print_phi_i_j(i,j))
                        for i in range(self._solution.Y.shape[1])
                        for j in range(3)]
