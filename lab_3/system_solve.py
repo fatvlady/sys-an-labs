@@ -51,7 +51,7 @@ def conjugate_gradient_method_v2(A, b, eps):
         ri1 = ri-ai*A*vi # r i+1
         betai = -float(vi.T*A*ri1)/float(vi.T*A*vi) # beta i
         vi1 = ri1+betai*vi
-        if (np.linalg.norm(ri1,np.inf)<eps) or i > 3 * n:
+        if (np.linalg.norm(ri1,np.inf)<eps) or i > 10 * n:
             break
         else:
             xi,vi,ri = xi1,vi1,ri1

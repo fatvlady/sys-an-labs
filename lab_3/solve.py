@@ -31,7 +31,7 @@ class Solve(object):
         # list of sum degrees [ 3,1,2] -> [3,4,6]
         self.dim_integral = [sum(self.dim[:i + 1]) for i in range(len(self.dim))]
 
-    def _minimize_equation(self, A, b, type='cjg'):
+    def _minimize_equation(self, A, b, type='cjg2'):
         """
         Finds such vector x that |Ax-b|->min.
         :param A: Matrix A
@@ -113,7 +113,7 @@ class Solve(object):
         elif self.poly_type == 'cheb':
             self.poly_f = special.eval_chebyt
         elif self.poly_type == 'sh_cheb_2':
-            self.poly_f = lambda deg, x: special.eval_sh_chebyu(deg, x) / 2**deg
+            self.poly_f = lambda deg, x: special.eval_sh_chebyu(deg, x) / (deg + 1)
 
     def built_A(self):
         '''
