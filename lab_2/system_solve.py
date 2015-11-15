@@ -13,7 +13,6 @@ def conjugate_gradient_method(A, b, eps):
     xi1 = xi = np.zeros(shape=(n,1), dtype = float)
     vi = ri = b # start condition
     i = 0 #loop for number iteration
-    N = 1000 #maximum of iteration
     while True:
         try:
             i+= 1
@@ -22,13 +21,10 @@ def conjugate_gradient_method(A, b, eps):
             ri1 = ri-ai*A*vi # r i+1
             betai = -float(vi.T*A*ri1)/float(vi.T*A*vi) # beta i
             vi1 = ri1+betai*vi
-            if (np.linalg.norm(ri1,np.inf)<eps) :
+            if (np.linalg.norm(ri1,np.inf)<eps) or i > 10 * n:
                 break
             else:
                 xi,vi,ri = xi1,vi1,ri1
-            if i==10*n:
-                break
-                #raise NameError('Over index: many iterations')
-        except NameError:
-            print("conjugate_gradient has stopped")
+        except Exception:
+            print("problem with minimization")
     return np.matrix(xi1)

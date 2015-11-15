@@ -529,14 +529,14 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
-   <sender>x2_dim</sender>
+   <sender>x3_deg</sender>
    <signal>valueChanged(int)</signal>
    <receiver>Form</receiver>
    <slot>degree_modified(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>361</x>
-     <y>78</y>
+     <x>244</x>
+     <y>133</y>
     </hint>
     <hint type="destinationlabel">
      <x>309</x>

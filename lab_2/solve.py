@@ -58,11 +58,11 @@ class Solve(object):
 
     def define_norm_vectors(self):
         '''
-        buile matrix X and Y
+        build matrix X and Y
         :return:
         '''
-        X1 = self.data[:,:self.degf[0]]
-        X2 = self.data[:,self.degf[0]:self.degf[1]]
+        X1 = self.data[:, :self.degf[0]]
+        X2 = self.data[:, self.degf[0]:self.degf[1]]
         X3 = self.data[:, self.degf[1]:self.degf[2]]
         #matrix of vectors i.e.X = [[X11,X12],[X21],...]
         self.X = [X1, X2, X3]
@@ -71,8 +71,8 @@ class Solve(object):
         # matrix, that consists of i.e. Y1,Y2
         self.Y = self.data[:, self.degf[2]:self.degf[3]]
         self.Y_ = self.datas[:, self.degf[2]:self.degf[3]]
-        self.X_ = [self.datas[:,:self.degf[0]], self.datas[:,self.degf[0]:self.degf[1]],
-                   self.datas[:,self.degf[1]:self.degf[2]]]
+        self.X_ = [self.datas[:, :self.degf[0]], self.datas[:,self.degf[0]:self.degf[1]],
+                   self.datas[:, self.degf[1]:self.degf[2]]]
 
     def built_B(self):
         def B_average():
@@ -207,7 +207,7 @@ class Solve(object):
             a2 = self._minimize_equation(self.Psi[i][:, self.degf[0]:self.degf[1]], self.Y[:, i])
             a3 = self._minimize_equation(self.Psi[i][:, self.degf[1]:], self.Y[:, i])
             # temp = self._minimize_equation(self.Psi[i], self.Y[:, i])
-            # self.a = np.append(self.a, temp)
+            # self.a = np.append(self.a, temp, axis=1)
             self.a = np.append(self.a, np.vstack((a1, a2, a3)),axis = 1)
 
     def built_F1i(self, psi, a):
