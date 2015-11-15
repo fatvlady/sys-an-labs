@@ -26,8 +26,9 @@ def conjugate_gradient_method(A, b, eps):
                 break
             else:
                 xi,vi,ri = xi1,vi1,ri1
-            if i==N:
-                raise NameError('Over index: many iterations')
+            if i==10*n:
+                break
+                #raise NameError('Over index: many iterations')
         except NameError:
-            print("conjugate_gradient_method is in 100 iteration")
+            print("conjugate_gradient has stopped")
     return np.matrix(xi1)

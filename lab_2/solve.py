@@ -19,7 +19,7 @@ class Solve(object):
         self.weights = d['weights']
         self.poly_type = d['poly_type']
         self.splitted_lambdas = d['lambda_multiblock']
-        self.eps = 1E-9
+        self.eps = 1E-6
         self.norm_error=0.0
         self.error=0.0
 
@@ -273,15 +273,16 @@ class Solve(object):
              ws.append(l+self.datas[i,self.degf[2]:self.degf[3]].tolist()[0])
         ws.append([])
 
-        ws.append(['X normalized:'])
+        ws.append(['X normalised:'])
         for i in range(self.n):
              ws.append(l+self.data[i,:self.degf[2]].tolist()[0])
         ws.append([])
 
-        ws.append(['Y normalized:'])
+        ws.append(['Y normalised:'])
         for i in range(self.n):
              ws.append(l+self.data[i,self.degf[2]:self.degf[3]].tolist()[0])
         ws.append([])
+
 
         ws.append(['matrix B:'])
         for i in range(self.n):
@@ -327,12 +328,12 @@ class Solve(object):
              ws.append(l+self.F[i].tolist()[0])
         ws.append([])
 
-        ws.append(['Y rebuilt normalized :'])
+        ws.append(['Y rebuilt :'])
         for i in range(self.n):
              ws.append(l+self.F_[i].tolist()[0])
         ws.append([])
 
-        ws.append(['Error normalized (Y - F)'])
+        ws.append(['Error normalised (Y - F)'])
         ws.append(l + self.norm_error)
 
         ws.append(['Error (Y_ - F_))'])

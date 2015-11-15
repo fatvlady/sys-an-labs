@@ -15,6 +15,7 @@ def test_p(a,p1,p2,p3):
         for j in range(1,p2):
             for k in range(1,p3):
                 a.p = [i+1,j+1,k+1]
+                print(a.p)
                 a.built_A()
                 a.lamb()
                 a.psi()
