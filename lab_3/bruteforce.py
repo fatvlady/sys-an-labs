@@ -29,4 +29,6 @@ class BruteForceWindow(QDialog, form_class):
         self.update_degrees.emit(3,3,3)
         return
 
+    def _process_bruteforce(self, lower, upper):
+        pass
 

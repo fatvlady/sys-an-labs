@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 
 from lab_3.solve import Solve
 import lab_3.basis_generator as b_gen
+from numpy.polynomial import Polynomial as Poly
 
 __author__ = 'vlad'
 
@@ -102,7 +103,7 @@ class PolynomialBuilder(object):
                     strings.append('(1 + {symbol}{deg}(x[{1},{2}]))^({0:.6f})'.format(self.c[i][j] * self.a[i][shift] *
                                                                               self.psi[i][j][k][n],
                                                                               j + 1, k + 1, symbol=self.symbol, deg=n))
-        return ' + '.join(strings)
+        return ' + '.join(strings) + ' - 1'
 
     def _print_F_i_transformed_denormed(self, i):
         """
@@ -133,7 +134,7 @@ class PolynomialBuilder(object):
 
     def _print_F_i_transformed(self, i):
         """
-        Returns string of F function in special polynomial form
+        Returns string of F function in regular polynomial form
         :param i: an index for Y
         :return: result string
         """
@@ -148,6 +149,34 @@ class PolynomialBuilder(object):
                     strings.append('({repr})^({0:.6f})'.format(self.c[i][j] * self.a[i][shift] * self.psi[i][j][k][n],
                                                                j + 1, k + 1, repr=' + '.join(summands)))
         return ' * '.join(strings) + ' - 1'
+
+    def _print_F_i_transformed_recovered(self, i):
+        """
+        Returns string of recovered F function in regular polynomial form
+        :param i: an index for Y
+        :return: result string
+        """
+        strings = list()
+        for j in range(3):
+            for k in range(len(self.psi[i][j])):
+                shift = sum(self._solution.dim[:j]) + k
+                diff = self.maxX[j][k] - self.minX[j][k]
+                mult_poly = np.poly1d([1 / diff, - self.minX[j][k] / diff])
+                for n in range(len(self.psi[i][j][k])):
+                    add_poly = np.poly1d([1])
+                    current_poly = np.poly1d([0])
+                    raw_coeffs = self.basis[n].coef
+                    for coef in raw_coeffs:
+                        current_poly += add_poly * coef
+                        add_poly *= mult_poly
+                    coeffs = current_poly.coeffs[::-1]
+                    summands = ['{0}(x[{1},{2}])^{deg}'.format(coeffs[index], j + 1, k + 1, deg=index)
+                                for index in range(1, len(coeffs))]
+                    summands.insert(0, str(1 + coeffs[0]))
+                    strings.append('({repr})^({0:.6f})'.format(self.c[i][j] * self.a[i][shift] * self.psi[i][j][k][n],
+                                                               j + 1, k + 1, repr=' + '.join(summands)))
+        strings.insert(0, str(self.maxY[i] - self.minY[i]))
+        return ' * '.join(strings) + ' + ' + str((2 * self.minY[i] - self.maxY[i]))
 
     def get_results(self):
         """
@@ -169,7 +198,7 @@ class PolynomialBuilder(object):
                        for i in range(self._solution.Y.shape[1])]
         f_strings_transformed_denormed = ['F^{0} transformed '
                                           'recovered:\n{result}\n'.format(i + 1,result=
-                                                                         self._print_F_i_transformed_denormed(i))
+                                                                         self._print_F_i_transformed_recovered(i))
                        for i in range(self._solution.Y.shape[1])]
         return '\n'.join(psi_strings + phi_strings + f_strings + f_strings_transformed + f_strings_transformed_denormed)
 
