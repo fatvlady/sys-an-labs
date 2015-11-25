@@ -134,15 +134,15 @@ class Solve(object):
                 m+= self.X[i].shape[1]*(self.deg[i]+1)
             return m
 
-        def coordinate(v,deg):
+        def coordinate(v, deg):
             '''
             :param v: vector
             :param deg: chebyshev degree polynom
             :return:column with chebyshev value of coordiate vector
             '''
-            c = np.ndarray(shape=(self.n,1), dtype = float)
+            c = np.ndarray(shape=(self.n, 1), dtype=float)
             for i in range(self.n):
-                c[i,0] = self.poly_f(deg, v[i])
+                c[i, 0] = self.poly_f(deg, v[i])
             return c
 
         def vector(vec, p):
@@ -156,7 +156,7 @@ class Solve(object):
             for j in range(m):
                 for i in range(p):
                     ch = coordinate(vec[:,j],i)
-                    a = np.append(a,ch,1)
+                    a = np.append(a, ch, 1)
             return a
 
         #k = mA()
@@ -355,6 +355,13 @@ class Solve(object):
     
     def prepare(self):
         self.define_data()
+        self.norm_data()
+        self.norm_data()
+        self.norm_data()
+        self.norm_data()
+        self.norm_data()
+        self.norm_data()
+        self.norm_data()
         self.norm_data()
         self.define_norm_vectors()
         self.built_B()
