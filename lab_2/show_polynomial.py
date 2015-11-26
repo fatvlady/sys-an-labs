@@ -27,6 +27,6 @@ class _Polynom(object):
             result.append(f.format(sign, coef, deg))
         return ''.join(result) or '0'
 
-print(_Polynom([3,4,0], 'xy'))
-
+s = _Polynom([3,4,0,5,0,12], 'X').__repr__()
+print(s+s)
 

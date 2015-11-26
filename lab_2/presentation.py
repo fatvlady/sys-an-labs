@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 
 from lab_2.solve import Solve
 import lab_2.basis_generator as b_gen
+from lab_2.show_polynomial import _Polynom
 
 __author__ = 'vlad'
 
@@ -129,8 +130,8 @@ class PolynomialBuilder(object):
                 constant += current_poly[0]
                 current_poly[0] = 0
                 current_poly = np.poly1d(current_poly.coeffs, variable='x[{0},{1}]'.format(j + 1, k + 1))
-                strings.append(str(current_poly))
-        strings.append('\n' + str(constant))
+                strings.append(str(_Polynom(current_poly)))
+        strings.append(str(constant))
         return ' +\n'.join(strings)
 
     def _print_F_i_transformed(self, i):
@@ -149,8 +150,8 @@ class PolynomialBuilder(object):
                                          variable='x[{0},{1}]'.format(j + 1, k + 1))
                 constant += current_poly[0]
                 current_poly[0] = 0
-                strings.append(str(current_poly))
-        strings.append('\n' + str(constant))
+                strings.append(str(_Polynom(current_poly)))
+        strings.append(str(constant))
         return ' +\n'.join(strings)
 
     def get_results(self):
