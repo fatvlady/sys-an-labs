@@ -72,7 +72,7 @@ class PolynomialBuilder(object):
         """
         strings = list()
         for n in range(len(self.psi[i][j][k])):
-            strings.append('{0:.6f}*{symbol}{deg}(x[{1},{2}])'.format(self.psi[i][j][k][n], j + 1, k + 1,
+            strings.append('{0:.6f}*{symbol}{deg}(x{1}{2})'.format(self.psi[i][j][k][n], j + 1, k + 1,
                                                                       symbol=self.symbol, deg=n))
         return ' + '.join(strings)
 
@@ -87,7 +87,7 @@ class PolynomialBuilder(object):
         for k in range(len(self.psi[i][j])):
             shift = sum(self._solution.deg[:j]) + k
             for n in range(len(self.psi[i][j][k])):
-                strings.append('{0:.6f}*{symbol}{deg}(x[{1},{2}])'.format(self.a[i][shift]*self.psi[i][j][k][n],
+                strings.append('{0:.6f}*{symbol}{deg}(x{1}{2})'.format(self.a[i][shift]*self.psi[i][j][k][n],
                                                                           j + 1, k + 1, symbol=self.symbol, deg=n))
         return ' + '.join(strings)
 
@@ -102,7 +102,7 @@ class PolynomialBuilder(object):
             for k in range(len(self.psi[i][j])):
                 shift = sum(self._solution.deg[:j]) + k
                 for n in range(len(self.psi[i][j][k])):
-                    strings.append('{0:.6f}*{symbol}{deg}(x[{1},{2}])'.format(self.c[i][j] * self.a[i][shift] *
+                    strings.append('{0:.6f}*{symbol}{deg}(x{1}{2})'.format(self.c[i][j] * self.a[i][shift] *
                                                                               self.psi[i][j][k][n],
                                                                               j + 1, k + 1, symbol=self.symbol, deg=n))
         return ' + '.join(strings)
@@ -129,8 +129,8 @@ class PolynomialBuilder(object):
                 current_poly = current_poly * (self.maxY[i] - self.minY[i]) + self.minY[i]
                 constant += current_poly[0]
                 current_poly[0] = 0
-                current_poly = np.poly1d(current_poly.coeffs, variable='x[{0},{1}]'.format(j + 1, k + 1))
-                strings.append(str(_Polynom(current_poly)))
+                current_poly = np.poly1d(current_poly.coeffs, variable='(x{0}{1})'.format(j + 1, k + 1))
+                strings.append(str(_Polynom(current_poly, '(x{0}{1})'.format(j + 1, k + 1))))
         strings.append(str(constant))
         return ' +\n'.join(strings)
 
@@ -147,10 +147,10 @@ class PolynomialBuilder(object):
                 shift = sum(self._solution.deg[:j]) + k
                 current_poly = np.poly1d(self._transform_to_standard(self.c[i][j] * self.a[i][shift] *
                                                                       self.psi[i][j][k])[::-1],
-                                         variable='x[{0},{1}]'.format(j + 1, k + 1))
+                                         variable='(x{0}{1})'.format(j + 1, k + 1))
                 constant += current_poly[0]
                 current_poly[0] = 0
-                strings.append(str(_Polynom(current_poly)))
+                strings.append(str(_Polynom(current_poly,'(x{0}{1})'.format(j + 1, k + 1))))
         strings.append(str(constant))
         return ' +\n'.join(strings)
 
@@ -160,18 +160,18 @@ class PolynomialBuilder(object):
         :return: Results string
         """
         self._form_psi()
-        psi_strings = ['Psi({0})([{1},{2}])={result}\n'.format(i + 1, j + 1, k + 1, result=self._print_psi_i_jk(i,j,k))
+        psi_strings = ['(Psi{1}{2})[{0}]={result}\n'.format(i + 1, j + 1, k + 1, result=self._print_psi_i_jk(i,j,k))
                        for i in range(self._solution.Y.shape[1])
                        for j in range(3)
                        for k in range(self._solution.deg[j])]
-        phi_strings = ['Phi({0})([{1}])={result}\n'.format(i + 1,j + 1,result=self._print_phi_i_j(i,j))
+        phi_strings = ['(Phi{1})[{0}]={result}\n'.format(i + 1,j + 1,result=self._print_phi_i_j(i,j))
                        for i in range(self._solution.Y.shape[1])
                        for j in range(3)]
-        f_strings = ['F({0})={result}\n'.format(i + 1,result=self._print_F_i(i))
+        f_strings = ['(F{0})={result}\n'.format(i + 1,result=self._print_F_i(i))
                        for i in range(self._solution.Y.shape[1])]
-        f_strings_transformed = ['F({0}) transformed:\n{result}\n'.format(i + 1,result=self._print_F_i_transformed(i))
+        f_strings_transformed = ['(F{0}) transformed:\n{result}\n'.format(i + 1,result=self._print_F_i_transformed(i))
                        for i in range(self._solution.Y.shape[1])]
-        f_strings_transformed_denormed = ['F({0}) transformed ' \
+        f_strings_transformed_denormed = ['(F{0}) transformed ' \
                                           'denormed:\n{result}\n'.format(i + 1,result=
         self._print_F_i_transformed_denormed(i))
                        for i in range(self._solution.Y.shape[1])]
