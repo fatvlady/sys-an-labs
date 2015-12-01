@@ -4,7 +4,7 @@ from lab_2.solve import *
 a= Solve({'samples':50, 'input_file': 'data_2.txt', 'dimensions': [3, 1, 2, 2], 'output_file': '', 'degrees': [3, 3, 3],
      'lambda_multiblock': False, 'weights': 'average', 'poly_type': 'hermit'})
 
-#a= Solve({'samples': 100, 'input_file': 'data_3.txt', 'dimensions': [1, 2, 1, 1], 'output_file': '', 'degrees': [3, 3, 3],
+#a= Solve({'samples': 100, 'input_file': 'data_2_our_sample.txt', 'dimensions': [1, 2, 1, 1], 'output_file': '', 'degrees': [3, 3, 3],
 #     'lambda_multiblock': False, 'weights': 'average', 'poly_type': 'hermit'})
 a.define_data()
 a.norm_data()
