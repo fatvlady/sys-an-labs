@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 
 from lab_3.solve import Solve
 import lab_3.basis_generator as b_gen
+from lab_3.show_polynomial import _Polynom
 
 __author__ = 'vlad'
 
@@ -127,7 +128,7 @@ class PolynomialBuilder(object):
                 constant += current_poly[0]
                 current_poly[0] = 0
                 current_poly = np.poly1d(current_poly.coeffs, variable='x[{0},{1}]'.format(j + 1, k + 1))
-                strings.append(str(current_poly))
+                strings.append(str(_Polynom(current_poly, '(x{0}{1})'.format(j + 1, k + 1))))
         strings.append('\n' + str(constant))
         return ' +\n'.join(strings)
 

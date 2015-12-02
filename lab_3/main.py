@@ -144,7 +144,7 @@ class MainWindow(QDialog, form_class):
             solver = Solve(self.__get_params())
             solver.prepare()
             self.solution = PolynomialBuilder(solver)
-            self.results_field.setText(self.solution.get_results())
+            self.results_field.setText(solver.show()+'\n\n'+self.solution.get_results())
         except Exception as e:
             QMessageBox.warning(self,'Error!','Error happened during execution: ' + str(e))
         self.exec_button.setEnabled(True)

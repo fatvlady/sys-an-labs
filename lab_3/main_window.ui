@@ -113,7 +113,7 @@
          <item row="2" column="1">
           <widget class="QSpinBox" name="x3_deg">
            <property name="value">
-            <number>4</number>
+            <number>8</number>
            </property>
           </widget>
          </item>
@@ -130,7 +130,7 @@
          <item row="1" column="1">
           <widget class="QSpinBox" name="x2_deg">
            <property name="value">
-            <number>7</number>
+            <number>10</number>
            </property>
           </widget>
          </item>
@@ -147,7 +147,7 @@
          <item row="0" column="1">
           <widget class="QSpinBox" name="x1_deg">
            <property name="value">
-            <number>7</number>
+            <number>10</number>
            </property>
           </widget>
          </item>
@@ -327,7 +327,7 @@
       <item row="2" column="0">
        <widget class="QLineEdit" name="line_output">
         <property name="text">
-         <string>a.xlsx</string>
+         <string/>
         </property>
         <property name="placeholderText">
          <string>Output file</string>
