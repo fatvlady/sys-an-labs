@@ -1,11 +1,13 @@
 __author__ = 'strike'
 from lab_3.solve import *
 
-pt = ['sh_cheb_doubled', 'cheb', 'sh_cheb_2']
-
+pt = ['sh_cheb_doubled', 'cheb', 'sh_cheb_2','sin','cos','arctg']
+#sh_cheb_doubled: 10 10 8 for data_u
+#cheb: 7 10 12 for data_u
+#sh_cheb_2 14 14 4 fro data_u
 a = Solve(
     {'samples': 45, 'input_file': 'data_u.txt', 'dimensions': [2, 2, 3, 4], 'output_file': '', 'degrees': [3, 3, 3],
-     'lambda_multiblock': False, 'weights': 'average', 'poly_type': pt[0]})
+     'lambda_multiblock': False, 'weights': 'average', 'poly_type': pt[3]})
 a.define_data()
 a.norm_data()
 a.define_norm_vectors()

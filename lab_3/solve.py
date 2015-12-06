@@ -1,5 +1,5 @@
 from copy import deepcopy
-
+import numpy as np
 from scipy import special
 from openpyxl import Workbook
 from tabulate import tabulate as tb
@@ -114,6 +114,12 @@ class Solve(object):
             self.poly_f = special.eval_chebyt
         elif self.poly_type == 'sh_cheb_2':
             self.poly_f = lambda deg, x: special.eval_sh_chebyu(deg, x) / (deg + 1)
+        elif self.poly_type == 'sin':
+            self.poly_f = lambda deg, x: ((np.sin(x)+ np.pi)/(2*np.pi))^deg
+        elif self.poly_type == 'cos':
+            self.poly_f = lambda x: (np.cos(x)+ np.pi)/(2*np.pi)
+        elif self.poly_type == 'arctg':
+            self.poly_f = lambda x: (np.arctan(x)+np.pi/2)/np.pi
 
     def built_A(self):
         """
