@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 from lab_3.solve import Solve
 import lab_3.basis_generator as b_gen
-from numpy.polynomial import Polynomial as Poly
+from lab_3.show_polynomial import _Polynom
 
 __author__ = 'vlad'
 
@@ -128,7 +128,7 @@ class PolynomialBuilder(object):
                 constant += current_poly[0]
                 current_poly[0] = 0
                 current_poly = np.poly1d(current_poly.coeffs, variable='x[{0},{1}]'.format(j + 1, k + 1))
-                strings.append(str(current_poly))
+                strings.append(str(_Polynom(current_poly, '(x{0}{1})'.format(j + 1, k + 1))))
         strings.append('\n' + str(constant))
         return ' +\n'.join(strings)
 
@@ -198,7 +198,7 @@ class PolynomialBuilder(object):
                        for i in range(self._solution.Y.shape[1])]
         f_strings_transformed_denormed = ['F^{0} transformed '
                                           'recovered:\n{result}\n'.format(i + 1,result=
-                                                                         self._print_F_i_transformed_recovered(i))
+                                                                         self._print_F_i_transformed_denormed(i))
                        for i in range(self._solution.Y.shape[1])]
         return '\n'.join(psi_strings + phi_strings + f_strings + f_strings_transformed + f_strings_transformed_denormed)
 

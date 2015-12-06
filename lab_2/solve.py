@@ -5,6 +5,7 @@ from scipy import special
 from openpyxl import Workbook
 
 from lab_2.system_solve import *
+from tabulate import tabulate as tb
 
 
 class Solve(object):
@@ -340,7 +341,61 @@ class Solve(object):
         ws.append(l+self.error)
 
         wb.save(self.filename_output)
-    
+
+    def show(self):
+        text = []
+
+        text.append('Input data: X')
+        text.append(tb(np.array(self.datas[:, :self.degf[2]])))
+
+        text.append('\nInput data: Y')
+        text.append(tb(np.array(self.datas[:,self.degf[2]:self.degf[3]])))
+
+        text.append('\nX normalised:')
+        text.append(tb(np.array(self.data[:,:self.degf[2]])))
+
+        text.append('\nY normalised:')
+        text.append(tb(np.array(self.data[:,self.degf[2]:self.degf[3]])))
+
+        text.append('\nmatrix B:')
+        text.append(tb(np.array(self.B)))
+
+        text.append('\nmatrix A:')
+        text.append(tb(np.array(self.A)))
+
+        text.append('\nmatrix Lambda:')
+        text.append(tb(np.array(self.Lamb)))
+
+        for j in range(len(self.Psi)):
+             s = '\nmatrix Psi%i:' %(j+1)
+             text.append(s)
+             text.append(tb(np.array(self.Psi[j])))
+
+        text.append('\nmatrix a:')
+        text.append(tb(self.a.tolist()))
+
+        for j in range(len(self.Fi)):
+             s = '\nmatrix F%i:' %(j+1)
+             text.append(s)
+             text.append(tb(np.array(self.Fi[j])))
+
+        text.append('\nmatrix c:')
+        text.append(tb(np.array(self.c)))
+
+        text.append('\nY rebuilt normalized :')
+        text.append(tb(np.array(self.F)))
+
+        text.append('\nY rebuilt :')
+        text.append(tb(self.F_.tolist()))
+
+        text.append('\nError normalised (Y - F)')
+        text.append(tb([self.norm_error]))
+
+        text.append('\nError (Y_ - F_))')
+        text.append(tb([self.error]))
+
+        return '\n'.join(text)
+
     def prepare(self):
         self.define_data()
         self.norm_data()
