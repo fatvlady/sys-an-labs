@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>434</width>
-    <height>300</height>
+    <width>340</width>
+    <height>208</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -34,12 +34,6 @@
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
           <widget class="QLabel" name="label">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
            <property name="text">
             <string>X1</string>
            </property>
@@ -50,12 +44,6 @@
          </item>
          <item>
           <widget class="QLabel" name="label_2">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
            <property name="text">
             <string>X2</string>
            </property>
@@ -66,12 +54,6 @@
          </item>
          <item>
           <widget class="QLabel" name="label_3">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
            <property name="text">
             <string>X3</string>
            </property>
@@ -96,13 +78,25 @@
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_3">
          <item>
-          <widget class="QSpinBox" name="from_1"/>
+          <widget class="QSpinBox" name="from_1">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+          </widget>
          </item>
          <item>
-          <widget class="QSpinBox" name="from_2"/>
+          <widget class="QSpinBox" name="from_2">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+          </widget>
          </item>
          <item>
-          <widget class="QSpinBox" name="from_3"/>
+          <widget class="QSpinBox" name="from_3">
+           <property name="minimum">
+            <number>1</number>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>
@@ -200,13 +194,49 @@
         </layout>
        </widget>
       </item>
+      <item>
+       <widget class="QGroupBox" name="groupBox_6">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="title">
+         <string>Step</string>
+        </property>
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="0" column="0">
+          <widget class="QSpinBox" name="st_1">
+           <property name="value">
+            <number>1</number>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QSpinBox" name="st_2">
+           <property name="value">
+            <number>1</number>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QSpinBox" name="st_3">
+           <property name="value">
+            <number>1</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
    <item>
     <widget class="QPushButton" name="pushButton">
      <property name="text">
-      <string>Exterminate!</string>
+      <string>Calculate</string>
      </property>
     </widget>
    </item>
