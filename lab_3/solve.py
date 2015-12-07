@@ -109,7 +109,7 @@ class Solve(object):
         :return: function
         """
         if self.poly_type == 'sh_cheb_doubled':
-            self.poly_f = special.eval_sh_chebyt
+            self.poly_f = lambda deg, x: special.eval_sh_chebyt(deg, x) if deg > 0 else 0.5
         elif self.poly_type == 'cheb':
             self.poly_f = special.eval_chebyt
         elif self.poly_type == 'sh_cheb_2':
@@ -211,7 +211,7 @@ class Solve(object):
         self.Psi = list()
         for i in range(self.dim[3]):
             self.Psi_log.append(built_psi(self.Lamb[:, i]))
-            self.Psi.append(np.exp(self.Psi_log[i]) - 1)
+            self.Psi.append(np.exp(self.Psi_log[i]) - 1 - self.OFFSET)
 
     def built_a(self):
         self.a = np.ndarray(shape=(self.mX, 0), dtype=float)
@@ -248,7 +248,7 @@ class Solve(object):
         self.Fi = list()
         for i in range(self.dim[3]):
             self.Fi_log.append(self.built_F1i(self.Psi_log[i], self.a[:, i]))
-            self.Fi.append(np.exp(self.Fi_log[-1]) - 1)
+            self.Fi.append(np.exp(self.Fi_log[-1]) - 1 - self.OFFSET)
 
     def built_c(self):
         self.c = np.ndarray(shape=(len(self.X), 0), dtype=float)

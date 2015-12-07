@@ -113,7 +113,7 @@
          <item row="2" column="1">
           <widget class="QSpinBox" name="x3_deg">
            <property name="value">
-            <number>15</number>
+            <number>1</number>
            </property>
           </widget>
          </item>
@@ -130,7 +130,7 @@
          <item row="1" column="1">
           <widget class="QSpinBox" name="x2_deg">
            <property name="value">
-            <number>6</number>
+            <number>1</number>
            </property>
           </widget>
          </item>
