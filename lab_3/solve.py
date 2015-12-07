@@ -364,6 +364,11 @@ class Solve(object):
 
     def show(self):
         text = []
+        text.append('\nError normalised (Y - F)')
+        text.append(tb([self.norm_error]))
+
+        text.append('\nError (Y_ - F_))')
+        text.append(tb([self.error]))
 
         text.append('Input data: X')
         text.append(tb(np.array(self.datas[:, :self.dim_integral[2]])))
@@ -408,11 +413,6 @@ class Solve(object):
         text.append('\nY rebuilt :')
         text.append(tb(self.F_.tolist()))
 
-        text.append('\nError normalised (Y - F)')
-        text.append(tb([self.norm_error]))
-
-        text.append('\nError (Y_ - F_))')
-        text.append(tb([self.error]))
 
         return '\n'.join(text)
 
