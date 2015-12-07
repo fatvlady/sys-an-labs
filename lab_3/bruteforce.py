@@ -2,7 +2,7 @@
 import sys
 
 from PyQt5.QtCore import pyqtSlot, pyqtSignal
-from PyQt5.QtWidgets import QApplication, QDialog
+from PyQt5.QtWidgets import QApplication, QDialog, QMessageBox
 from PyQt5.uic import loadUiType
 from lab_3.Calculate_optimal_degrees import *
 
@@ -31,10 +31,28 @@ class BruteForceWindow(QDialog, form_class):
         self.step = [self.st_1.value(), self.st_2.value(), self.st_3.value()]
         solver = Solve(self.params)
         p = [[i for i in range(self.low_edge[j], self.high_edge[j]+1, self.step[j])] for j in range(len(self.step))]
-        x1_deg, x2_deg, x3_deg = determine_deg(solver, p[0], p[1], p[2])
-        self.res_1.setValue(x1_deg)
-        self.res_2.setValue(x2_deg)
-        self.res_3.setValue(x3_deg)
+        best_deg = determine_deg(solver, p[0], p[1], p[2])
+        bd = best_deg[0]
+        self.res_1.setValue(bd[0])
+        self.res_2.setValue(bd[1])
+        self.res_3.setValue(bd[2])
+
+        msgbox = QMessageBox()
+
+        msgbox.setText('Best degrees:'+bd.__str__()+'.')
+        msgbox.setInformativeText("Do you want to copy degrees in main window?")
+        msgbox.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
+        msgbox.setDefaultButton(QMessageBox.Ok)
+        ret = msgbox.exec_()
+        if ret == QMessageBox.Ok:
+            self.update_degrees.emit(bd[0],bd[1], bd[2])
+            self.close()
+        # result = QMessageBox.question(self, 'Long-time operation',
+        #                               'Adjusting degrees lasts long. Do you want to perform it?',
+        #                               QMessageBox.Ok | QMessageBox.No)
+        # if result == QMessageBox.Ok:
+        #     BruteForceWindow.launch(self)
+
         #self.update_degrees.emit(3,3,3)
         return
 

@@ -21,9 +21,9 @@ def determine_deg(a, p1, p2, p3):
                 a.built_F_()
                 # d[str(i)+' '+str(j)+' '+str(k)] = [np.linalg.norm(a.F - a.Y), np.std(a.F_ - a.Y_, axis=0),\
                 #                   np.linalg.norm(a.F_ - a.Y_)]
-                d.append((str(i) + ' ' + str(j) + ' ' + str(k), np.linalg.norm(a.norm_error)))
+                d.append( ((i,j,k), np.linalg.norm(a.norm_error), a.norm_error) )
     best = d[0]
     for i in d:
         if i[1] < best[1]:
             best = i
-    return (int(i) for i in best[0])
+    return best

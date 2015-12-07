@@ -141,7 +141,7 @@ class MainWindow(QDialog, form_class):
     def exec_clicked(self):
         self.exec_button.setEnabled(False)
         try:
-            solver = Solve(self.__get_params())
+            solver = Solve(self._get_params())
             solver.prepare()
             self.solution = PolynomialBuilder(solver)
             self.results_field.setText(solver.show()+'\n\n'+self.solution.get_results())
@@ -152,11 +152,7 @@ class MainWindow(QDialog, form_class):
 
     @pyqtSlot()
     def bruteforce_called(self):
-        result = QMessageBox.question(self, 'Long-time operation',
-                                      'Adjusting degrees lasts long. Do you want to perform it?',
-                                      QMessageBox.Ok | QMessageBox.No)
-        if result == QMessageBox.Ok:
-            BruteForceWindow.launch(self)
+        BruteForceWindow.launch(self)
         return
 
     @pyqtSlot(int, int, int)
@@ -176,7 +172,7 @@ class MainWindow(QDialog, form_class):
         self.weight_method = value.lower()
         return
 
-    def __get_params(self):
+    def _get_params(self):
         return dict(poly_type=self.type, degrees=self.degrees, dimensions=self.dimensions,
                     samples=self.samples_num, input_file=self.input_path, output_file=self.output_path,
                     weights=self.weight_method, lambda_multiblock=self.lambda_multiblock)
