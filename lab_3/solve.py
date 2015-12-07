@@ -231,12 +231,12 @@ class Solve(object):
         not use; it used in next function
         :param psi: matrix psi (only one
         :param a: vector with shape = (6,1)
-        :param dim_integral:  = [3,4,6]//fibonachi of deg
+        :param dim_integral:  = [3,4,6]//fibonacci of deg
         :return: matrix of (three) components with F1 F2 and F3
         """
         m = len(self.X)  # m  = 3
         F1i = np.ndarray(shape=(self.n, m), dtype=float)
-        k = 0  # point of begining columnt to multipy
+        k = 0  # point of beginning column to multiply
         for j in range(m):  # 0 - 2
             for i in range(self.n):  # 0 - 49
                 F1i[i, j] = psi[i, k:self.dim_integral[j]] * a[k:self.dim_integral[j], 0]
@@ -380,8 +380,8 @@ class Solve(object):
         text.append('\nmatrix B:')
         text.append(tb(np.array(self.B)))
 
-        text.append('\nmatrix A:')
-        text.append(tb(np.array(self.A)))
+        # text.append('\nmatrix A:')
+        # text.append(tb(np.array(self.A)))
 
         text.append('\nmatrix Lambda:')
         text.append(tb(np.array(self.Lamb)))

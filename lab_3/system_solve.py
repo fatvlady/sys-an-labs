@@ -22,10 +22,9 @@ def conjugate_gradient_method(A, b, eps):
             ri1 = ri-ai*A*vi # r i+1
             betai = -float(vi.T*A*ri1)/float(vi.T*A*vi) # beta i
             vi1 = ri1+betai*vi
-            if (np.linalg.norm(ri1,np.inf)<eps) :
+            xi,vi,ri = xi1,vi1,ri1
+            if (np.linalg.norm(ri1,np.inf)<eps):
                 break
-            else:
-                xi,vi,ri = xi1,vi1,ri1
             if i==N:
                 raise NameError('Over index: many iterations')
         except NameError:
@@ -41,9 +40,12 @@ def conjugate_gradient_method_v2(A, b, eps):
     :return: solution x
     '''
     n = len(A.T) # number column
-    xi1 = xi = np.zeros(shape=(n,1), dtype=float)
+    xi = np.zeros(shape=(n,1), dtype=float)
+    xi1 = xi.copy()
+    x_best = xi.copy()
     vi = ri = b # start condition
-    i = 0 #loop for number iteration\
+    resid_best_norm = np.linalg.norm(ri, np.inf)
+    i = 0 #loop for number iteration
     while True:
         i+= 1
         ai = float(vi.T*ri)/float(vi.T*A*vi) # alpha i
@@ -51,11 +53,14 @@ def conjugate_gradient_method_v2(A, b, eps):
         ri1 = ri-ai*A*vi # r i+1
         betai = -float(vi.T*A*ri1)/float(vi.T*A*vi) # beta i
         vi1 = ri1+betai*vi
-        if (np.linalg.norm(ri1,np.inf)<eps) or i > 10 * n:
+        xi,vi,ri = xi1,vi1,ri1
+        resid_current_norm = np.linalg.norm(ri,np.inf)
+        if resid_current_norm < resid_best_norm:
+            resid_best_norm = resid_current_norm
+            x_best = xi
+        if (resid_best_norm<eps) or i > 10 * n:
             break
-        else:
-            xi,vi,ri = xi1,vi1,ri1
-    return np.matrix(xi1)
+    return np.matrix(x_best)
 
 def conjugate_gradient_method_v3(A, b, eps):
     '''
