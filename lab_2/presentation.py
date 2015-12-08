@@ -49,7 +49,7 @@ class PolynomialBuilder(object):
                 psi_i.append(psi_i_j)
             self.psi.append(psi_i)
 
-    def _transform_to_standard(self, coeffs: np.ndarray):
+    def _transform_to_standard(self, coeffs):
         """
         Transforms special polynomial to standard
         :param coeffs: coefficients of special polynomial
@@ -154,7 +154,7 @@ class PolynomialBuilder(object):
         strings.append(str(constant))
         return ' +\n'.join(strings)
 
-     def get_results(self):
+    def get_results(self):
         """
         Generates results based on given solution
         :return: Results string
