@@ -40,6 +40,8 @@ class MainWindow(QDialog, form_class):
             self.type = 'cheb'
         elif self.radio_sh_cheb_2.isChecked():
             self.type = 'sh_cheb_2'
+        elif self.radio_custom.isChecked():
+            self.type = 'custom'
         self.input_path = self.line_input.text()
         self.output_path = self.line_output.text()
         self.samples_num = self.sample_spin.value()
@@ -126,6 +128,8 @@ class MainWindow(QDialog, form_class):
                 self.type = 'cheb'
             elif sender == 'radio_sh_cheb_2':
                 self.type = 'sh_cheb_2'
+            elif sender == 'radio_custom':
+                self.type = 'custom'
         return
 
     @pyqtSlot()

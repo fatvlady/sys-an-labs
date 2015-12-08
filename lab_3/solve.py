@@ -109,7 +109,7 @@ class Solve(object):
         :return: function
         """
         if self.poly_type == 'sh_cheb_doubled':
-            self.poly_f = lambda deg, x: special.eval_sh_chebyt(deg, x) if deg > 0 else 0.5
+            self.poly_f = special.eval_sh_chebyt
         elif self.poly_type == 'cheb':
             self.poly_f = special.eval_chebyt
         elif self.poly_type == 'sh_cheb_2':
