@@ -10,6 +10,7 @@ from PyQt5.uic import loadUiType
 
 from lab_3.presentation import PolynomialBuilder
 from lab_3.solve import Solve
+from lab_3.solve_custom import SolveCustom
 from lab_3.bruteforce import BruteForceWindow
 
 app = QApplication(sys.argv)
@@ -40,8 +41,7 @@ class MainWindow(QDialog, form_class):
             self.type = 'cheb'
         elif self.radio_sh_cheb_2.isChecked():
             self.type = 'sh_cheb_2'
-        elif self.radio_custom.isChecked():
-            self.type = 'custom'
+        self.custom_func_struct = self.custom_check.isChecked()
         self.input_path = self.line_input.text()
         self.output_path = self.line_output.text()
         self.samples_num = self.sample_spin.value()
@@ -128,9 +128,11 @@ class MainWindow(QDialog, form_class):
                 self.type = 'cheb'
             elif sender == 'radio_sh_cheb_2':
                 self.type = 'sh_cheb_2'
-            elif sender == 'radio_custom':
-                self.type = 'custom'
         return
+
+    @pyqtSlot(bool)
+    def structure_changed(self, isdown):
+        self.custom_func_struct = isdown
 
     @pyqtSlot()
     def plot_clicked(self):
@@ -145,7 +147,10 @@ class MainWindow(QDialog, form_class):
     def exec_clicked(self):
         self.exec_button.setEnabled(False)
         try:
-            solver = Solve(self._get_params())
+            if self.custom_func_struct:
+                solver = SolveCustom(self._get_params())
+            else:
+                solver = Solve(self._get_params())
             solver.prepare()
             self.solution = PolynomialBuilder(solver)
             self.results_field.setText(solver.show()+'\n\n'+self.solution.get_results())

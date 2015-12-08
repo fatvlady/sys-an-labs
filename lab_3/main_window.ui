@@ -86,9 +86,9 @@
           </widget>
          </item>
          <item>
-          <widget class="QRadioButton" name="radio_custom">
+          <widget class="QCheckBox" name="custom_check">
            <property name="text">
-            <string>RadioButton</string>
+            <string>Custom structure</string>
            </property>
           </widget>
          </item>
@@ -747,6 +747,22 @@ p, li { white-space: pre-wrap; }
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>custom_check</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>Form</receiver>
+   <slot>structure_changed(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>111</x>
+     <y>160</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>370</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <signal>input_changed(QString)</signal>
@@ -774,5 +790,6 @@ p, li { white-space: pre-wrap; }
   <slot>weights_modified(QString)</slot>
   <slot>lambda_calc_method_changed(bool)</slot>
   <slot>bruteforce_called()</slot>
+  <slot>structure_changed(bool)</slot>
  </slots>
 </ui>
