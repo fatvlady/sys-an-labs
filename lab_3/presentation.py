@@ -22,6 +22,7 @@ class PolynomialBuilder(object):
         elif solution.poly_type == 'sh_cheb_2':
             self.symbol = 'U'
             self.basis = b_gen.basis_sh_chebyshev_2_shrinked(max_degree)
+        assert self.symbol
         self.a = solution.a.T.tolist()
         self.c = solution.c.T.tolist()
         self.minX = [X.min(axis=0).getA1() for X in solution.X_]
@@ -29,22 +30,22 @@ class PolynomialBuilder(object):
         self.minY = solution.Y_.min(axis=0).getA1()
         self.maxY = solution.Y_.max(axis=0).getA1()
 
-    def _form_psi(self):
+    def _form_lamb_lists(self):
         """
         Generates specific basis coefficients for Psi functions
         """
-        self.psi = list()
+        self.lamb = list()
         for i in range(self._solution.Y.shape[1]):  # `i` is an index for Y
-            psi_i = list()
+            lamb_i = list()
             shift = 0
             for j in range(3):  # `j` is an index to choose vector from X
-                psi_i_j = list()
+                lamb_i_j = list()
                 for k in range(self._solution.dim[j]):  # `k` is an index for vector component
-                    psi_i_jk = self._solution.Lamb[shift:shift + self._solution.deg[j], i].getA1()
+                    lamb_i_jk = self._solution.Lamb[shift:shift + self._solution.deg[j], i].getA1()
                     shift += self._solution.deg[j]
-                    psi_i_j.append(psi_i_jk)
-                psi_i.append(psi_i_j)
-            self.psi.append(psi_i)
+                    lamb_i_j.append(lamb_i_jk)
+                lamb_i.append(lamb_i_j)
+            self.lamb.append(lamb_i)
 
     def _transform_to_standard(self, coeffs):
         """
@@ -68,8 +69,8 @@ class PolynomialBuilder(object):
         :return: result string
         """
         strings = list()
-        for n in range(len(self.psi[i][j][k])):
-            strings.append('(1 + {symbol}{deg}(x[{1},{2}]))^({0:.6f})'.format(self.psi[i][j][k][n], j + 1, k + 1,
+        for n in range(len(self.lamb[i][j][k])):
+            strings.append('(1 + {symbol}{deg}(x{1}{2}))^({0:.6f})'.format(self.lamb[i][j][k][n], j + 1, k + 1,
                                                                       symbol=self.symbol, deg=n))
         return ' * '.join(strings)
 
@@ -81,10 +82,10 @@ class PolynomialBuilder(object):
         :return: result string
         """
         strings = list()
-        for k in range(len(self.psi[i][j])):
+        for k in range(len(self.lamb[i][j])):
             shift = sum(self._solution.dim[:j]) + k
-            for n in range(len(self.psi[i][j][k])):
-                strings.append('(1 + {symbol}{deg}(x[{1},{2}]))^({0:.6f})'.format(self.a[i][shift]*self.psi[i][j][k][n],
+            for n in range(len(self.lamb[i][j][k])):
+                strings.append('(1 + {symbol}{deg}(x{1}{2}))^({0:.6f})'.format(self.a[i][shift]*self.lamb[i][j][k][n],
                                                                           j + 1, k + 1, symbol=self.symbol, deg=n))
         return ' * '.join(strings)
 
@@ -97,40 +98,14 @@ class PolynomialBuilder(object):
         """
         strings = list()
         for j in range(3):
-            for k in range(len(self.psi[i][j])):
+            for k in range(len(self.lamb[i][j])):
                 shift = sum(self._solution.dim[:j]) + k
-                for n in range(len(self.psi[i][j][k])):
-                    strings.append('(1 + {symbol}{deg}(x[{1},{2}]))^({0:.6f})'.format(self.c[i][j] * self.a[i][shift] *
-                                                                              self.psi[i][j][k][n],
+                for n in range(len(self.lamb[i][j][k])):
+                    strings.append('(1 + {symbol}{deg}(x{1}{2}))^({0:.6f})'.format(self.c[i][j] * self.a[i][shift] *
+                                                                              self.lamb[i][j][k][n],
                                                                               j + 1, k + 1, symbol=self.symbol, deg=n))
-        return ' + '.join(strings) + ' - 1'
+        return ' * '.join(strings)
 
-    def _print_F_i_transformed_denormed(self, i):
-        """
-        Returns string of F function in special polynomial form
-        :param i: an index for Y
-        :return: result string
-        """
-        strings = list()
-        constant = 0
-        for j in range(3):
-            for k in range(len(self.psi[i][j])):
-                shift = sum(self._solution.dim[:j]) + k
-                raw_coeffs = self._transform_to_standard(self.c[i][j] * self.a[i][shift] * self.psi[i][j][k])
-                diff = self.maxX[j][k] - self.minX[j][k]
-                mult_poly = np.poly1d([1 / diff, - self.minX[j][k] / diff])
-                add_poly = np.poly1d([1])
-                current_poly = np.poly1d([0])
-                for n in range(len(raw_coeffs)):
-                    current_poly += add_poly * raw_coeffs[n]
-                    add_poly *= mult_poly
-                current_poly = current_poly * (self.maxY[i] - self.minY[i]) + self.minY[i]
-                constant += current_poly[0]
-                current_poly[0] = 0
-                current_poly = np.poly1d(current_poly.coeffs, variable='x[{0},{1}]'.format(j + 1, k + 1))
-                strings.append(str(_Polynom(current_poly, '(x{0}{1})'.format(j + 1, k + 1))))
-        strings.append('\n' + str(constant))
-        return ' +\n'.join(strings)
 
     def _print_F_i_transformed(self, i):
         """
@@ -140,15 +115,15 @@ class PolynomialBuilder(object):
         """
         strings = list()
         for j in range(3):
-            for k in range(len(self.psi[i][j])):
+            for k in range(len(self.lamb[i][j])):
                 shift = sum(self._solution.dim[:j]) + k
-                for n in range(len(self.psi[i][j][k])):
-                    summands = ['{0}(x[{1},{2}])^{deg}'.format(self.basis[n].coef[index], j + 1, k + 1, deg=index)
+                for n in range(len(self.lamb[i][j][k])):
+                    summands = ['{0}(x{1}{2})^{deg}'.format(self.basis[n].coef[index], j + 1, k + 1, deg=index)
                                 for index in range(1, len(self.basis[n].coef))]
                     summands.insert(0, str(1 + self.basis[n].coef[0]))
-                    strings.append('({repr})^({0:.6f})'.format(self.c[i][j] * self.a[i][shift] * self.psi[i][j][k][n],
+                    strings.append('({repr})^({0:.6f})'.format(self.c[i][j] * self.a[i][shift] * self.lamb[i][j][k][n],
                                                                j + 1, k + 1, repr=' + '.join(summands)))
-        return ' * '.join(strings) + ' - 1'
+        return ' * '.join(strings)
 
     def _print_F_i_transformed_recovered(self, i):
         """
@@ -158,11 +133,11 @@ class PolynomialBuilder(object):
         """
         strings = list()
         for j in range(3):
-            for k in range(len(self.psi[i][j])):
+            for k in range(len(self.lamb[i][j])):
                 shift = sum(self._solution.dim[:j]) + k
                 diff = self.maxX[j][k] - self.minX[j][k]
                 mult_poly = np.poly1d([1 / diff, - self.minX[j][k] / diff])
-                for n in range(len(self.psi[i][j][k])):
+                for n in range(len(self.lamb[i][j][k])):
                     add_poly = np.poly1d([1])
                     current_poly = np.poly1d([0])
                     raw_coeffs = self.basis[n].coef
@@ -170,10 +145,10 @@ class PolynomialBuilder(object):
                         current_poly += add_poly * coef
                         add_poly *= mult_poly
                     coeffs = current_poly.coeffs[::-1]
-                    summands = ['{0}(x[{1},{2}])^{deg}'.format(coeffs[index], j + 1, k + 1, deg=index)
+                    summands = ['{0}(x{1}{2})^{deg}'.format(coeffs[index], j + 1, k + 1, deg=index)
                                 for index in range(1, len(coeffs))]
                     summands.insert(0, str(1 + coeffs[0]))
-                    strings.append('({repr})^({0:.6f})'.format(self.c[i][j] * self.a[i][shift] * self.psi[i][j][k][n],
+                    strings.append('({repr})^({0:.6f})'.format(self.c[i][j] * self.a[i][shift] * self.lamb[i][j][k][n],
                                                                j + 1, k + 1, repr=' + '.join(summands)))
         strings.insert(0, str(self.maxY[i] - self.minY[i]))
         return ' * '.join(strings) + ' + ' + str((2 * self.minY[i] - self.maxY[i]))
@@ -183,7 +158,7 @@ class PolynomialBuilder(object):
         Generates results based on given solution
         :return: Results string
         """
-        self._form_psi()
+        self._form_lamb_lists()
         psi_strings = ['Psi^{0}_[{1},{2}]={result} - 1\n'.format(i + 1, j + 1, k + 1,
                                                                    result=self._print_psi_i_jk(i,j,k))
                        for i in range(self._solution.Y.shape[1])
@@ -192,13 +167,13 @@ class PolynomialBuilder(object):
         phi_strings = ['Phi^{0}_[{1}]={result} - 1\n'.format(i + 1,j + 1,result=self._print_phi_i_j(i,j))
                        for i in range(self._solution.Y.shape[1])
                        for j in range(3)]
-        f_strings = ['F^{0}={result} - 1\n'.format(i + 1,result=self._print_F_i(i))
+        f_strings = ['F^{0} in special basis:\n{result} - 1\n'.format(i + 1,result=self._print_F_i(i))
                        for i in range(self._solution.Y.shape[1])]
-        f_strings_transformed = ['F^{0} transformed:\n{result}\n'.format(i + 1,result=self._print_F_i_transformed(i))
+        f_strings_transformed = ['F^{0} in standard basis:\n{result} - 1\n'.format(i + 1,result=self._print_F_i_transformed(i))
                        for i in range(self._solution.Y.shape[1])]
-        f_strings_transformed_denormed = ['F^{0} transformed '
-                                          'recovered:\n{result}\n'.format(i + 1,result=
-                                                                         self._print_F_i_transformed_denormed(i))
+        f_strings_transformed_denormed = ['F^{0} in standard basis '
+                                          'denormed:\n{result}\n'.format(i + 1,result=
+                                                                         self._print_F_i_transformed_recovered(i))
                        for i in range(self._solution.Y.shape[1])]
         return '\n'.join(psi_strings + phi_strings + f_strings + f_strings_transformed + f_strings_transformed_denormed)
 

@@ -159,7 +159,7 @@ class PolynomialBuilder(object):
         Generates results based on given solution
         :return: Results string
         """
-        self._form_psi()
+        self._form_lamb_lists()
         psi_strings = ['(Psi{1}{2})[{0}]={result}\n'.format(i + 1, j + 1, k + 1, result=self._print_psi_i_jk(i, j, k))
                        for i in range(self._solution.Y.shape[1])
                        for j in range(3)
