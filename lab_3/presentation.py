@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 
 from lab_3.solve import Solve
 import lab_3.basis_generator as b_gen
+from numpy.polynomial import Polynomial as pnm
 from lab_3.show_polynomial import _Polynom
 
 __author__ = 'vlad'
@@ -114,15 +115,19 @@ class PolynomialBuilder(object):
         :return: result string
         """
         strings = list()
+        power_sum = 0
         for j in range(3):
             for k in range(len(self.lamb[i][j])):
                 shift = sum(self._solution.dim[:j]) + k
-                for n in range(len(self.lamb[i][j][k])):
+                power_sum += self.c[i][j] * self.a[i][shift] * self.lamb[i][j][k][0]
+                for n in range(1, len(self.lamb[i][j][k])):
                     summands = ['{0}(x{1}{2})^{deg}'.format(self.basis[n].coef[index], j + 1, k + 1, deg=index)
-                                for index in range(1, len(self.basis[n].coef))]
-                    summands.insert(0, str(1 + self.basis[n].coef[0]))
+                                for index in range(1, len(self.basis[n].coef)) if self.basis[n].coef[index] != 0]
+                    if self.basis[n].coef[0] != -1:
+                        summands.insert(0, str(1 + self.basis[n].coef[0]))
                     strings.append('({repr})^({0:.6f})'.format(self.c[i][j] * self.a[i][shift] * self.lamb[i][j][k][n],
                                                                j + 1, k + 1, repr=' + '.join(summands)))
+        strings.insert(0, str((1 + self.basis[0].coef[0]) ** (power_sum)))
         return ' * '.join(strings)
 
     def _print_F_i_transformed_recovered(self, i):
@@ -132,25 +137,22 @@ class PolynomialBuilder(object):
         :return: result string
         """
         strings = list()
+        power_sum = 0
         for j in range(3):
             for k in range(len(self.lamb[i][j])):
                 shift = sum(self._solution.dim[:j]) + k
                 diff = self.maxX[j][k] - self.minX[j][k]
-                mult_poly = np.poly1d([1 / diff, - self.minX[j][k] / diff])
-                for n in range(len(self.lamb[i][j][k])):
-                    add_poly = np.poly1d([1])
-                    current_poly = np.poly1d([0])
-                    raw_coeffs = self.basis[n].coef
-                    for coef in raw_coeffs:
-                        current_poly += add_poly * coef
-                        add_poly *= mult_poly
-                    coeffs = current_poly.coeffs[::-1]
+                mult_poly = pnm([ - self.minX[j][k] / diff, 1 / diff])
+                power_sum += self.c[i][j] * self.a[i][shift] * self.lamb[i][j][k][0]
+                for n in range(1, len(self.lamb[i][j][k])):
+                    res_polynomial = self.basis[n](mult_poly) + 1
+                    coeffs = res_polynomial.coef
                     summands = ['{0}(x{1}{2})^{deg}'.format(coeffs[index], j + 1, k + 1, deg=index)
                                 for index in range(1, len(coeffs))]
-                    summands.insert(0, str(1 + coeffs[0]))
+                    summands.insert(0, str(coeffs[0]))
                     strings.append('({repr})^({0:.6f})'.format(self.c[i][j] * self.a[i][shift] * self.lamb[i][j][k][n],
                                                                j + 1, k + 1, repr=' + '.join(summands)))
-        strings.insert(0, str(self.maxY[i] - self.minY[i]))
+        strings.insert(0, str((self.maxY[i] - self.minY[i]) * (1 + self.basis[0].coef[0]) ** (power_sum)))
         return ' * '.join(strings) + ' + ' + str((2 * self.minY[i] - self.maxY[i]))
 
     def get_results(self):
