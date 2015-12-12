@@ -149,11 +149,13 @@ class MainWindow(QDialog, form_class):
         try:
             if self.custom_func_struct:
                 solver = SolveCustom(self._get_params())
+                solver.prepare()
+                self.results_field.setText(solver.show())
             else:
                 solver = Solve(self._get_params())
-            solver.prepare()
-            self.solution = PolynomialBuilder(solver)
-            self.results_field.setText(solver.show()+'\n\n'+self.solution.get_results())
+                solver.prepare()
+                self.solution = PolynomialBuilder(solver)
+                self.results_field.setText(solver.show()+'\n\n'+self.solution.get_results())
         except Exception as e:
             QMessageBox.warning(self,'Error!','Error happened during execution: ' + str(e))
         self.exec_button.setEnabled(True)
