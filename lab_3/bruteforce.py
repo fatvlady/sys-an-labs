@@ -4,7 +4,7 @@ from PyQt5.QtCore import pyqtSlot, pyqtSignal
 from PyQt5.QtWidgets import QDialog, QMessageBox
 from PyQt5.uic import loadUiType
 
-from lab_3.calculate_optimal_degrees import *
+from lab_3.Calculate_optimal_degrees import *
 from lab_3.solve_custom import SolveExpTh
 from lab_3.solve import Solve
 

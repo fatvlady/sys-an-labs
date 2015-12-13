@@ -47,19 +47,6 @@ class PolynomialBuilder(object):
                 lamb_i.append(lamb_i_j)
             self.lamb.append(lamb_i)
 
-    def _transform_to_standard(self, coeffs):
-        """
-        Transforms special polynomial to standard
-        :param coeffs: coefficients of special polynomial
-        :return: coefficients of standard polynomial
-        """
-        std_coeffs = np.zeros(coeffs.shape)
-        for index in range(coeffs.shape[0]):
-            cp = self.basis[index].coef.copy()
-            cp.resize(coeffs.shape)
-            std_coeffs += coeffs[index] * cp
-        return std_coeffs
-
     def _print_psi_i_jk(self, i, j, k):
         """
         Returns string of Psi function in special polynomial form
@@ -206,3 +193,134 @@ class PolynomialBuilder(object):
         fig.show()
 
 
+class PolynomialBuilderExpTh(PolynomialBuilder):
+
+    def _print_psi_i_jk(self, i, j, k, mode=0):
+        """
+        Returns string of Psi function
+        mode = 0 -  in special polynomial form
+        mode = 1 -  in regular polynomial form
+        mode = 2 -  in regular polynomial form with restored X
+        :param i: an index for Y
+        :param j: an index to choose vector from X
+        :param k: an index for vector component
+        :return: result string
+        """
+        strings = list()
+        for n in range(len(self.lamb[i][j][k])):
+            inner = 'stub'
+            if mode == 0:
+                inner = '{symbol}{deg}(x{0}{1})'.format(j + 1, k + 1, symbol=self.symbol, deg=n)
+            elif mode == 1:
+                inner = str(self.basis[n].coef[0])
+                if n > 0:
+                    inner += ' + ' + ' + '.join('({coef})(x{0}{1})^{deg}'.format(j + 1, k + 1, coef=coef, deg=index)
+                                                for index, coef in enumerate(self.basis[n].coef) if index > 0)
+            elif mode == 2:
+                diff = self.maxX[j][k] - self.minX[j][k]
+                mult_poly = pnm([ - self.minX[j][k] / diff, 1 / diff])
+                cur_poly = self.basis[n](mult_poly)
+                inner = str(cur_poly.coef[0])
+                if n > 0:
+                    inner += ' + ' + ' + '.join('({coef})(x{0}{1})^{deg}'.format(j + 1, k + 1, coef=coef, deg=index)
+                                                for index, coef in enumerate(cur_poly.coef) if index > 0)
+            strings.append('exp({0:.6f}*tanh({inner}))'.format(self.lamb[i][j][k][n], inner=inner))
+        return ' * '.join(strings) + ' - 1'
+
+    def _print_phi_i_j(self, i, j, mode=0):
+        """
+        Returns string of Phi function in special polynomial form
+        :param i: an index for Y
+        :param j: an index to choose vector from X
+        :return: result string
+        """
+        strings = list()
+        for k in range(len(self.lamb[i][j])):
+            strings.append('exp({0:.6f}*tanh({inner}))'.format(self.a[i][sum(self._solution.dim[:j]) + k],
+                                                               inner=self._print_psi_i_jk(i, j, k, mode)))
+        return ' * '.join(strings) + ' - 1'
+
+    def _print_F_i(self, i, mode=0):
+        """
+        Returns string of F function in special polynomial form
+        :param i: an index for Y
+        :return: result string
+        """
+        strings = list()
+        for j in range(3):
+            strings.append('exp({0:.6f}*tanh({inner}))'.format(self.c[i][j], inner=self._print_phi_i_j(i, j, mode)))
+        if mode == 2:
+            strings.insert(0, str(self.maxY[i] - self.minY[i]))
+            return ' * '.join(strings) + ' + (' + str((2 * self.minY[i] - self.maxY[i])) + ')'
+        else:
+            return ' * '.join(strings) + ' - 1'
+
+    def _print_F_i_transformed(self, i):
+        """
+        Returns string of F function in regular polynomial form
+        :param i: an index for Y
+        :return: result string
+        """
+        strings = list()
+        power_sum = 0
+        for j in range(3):
+            for k in range(len(self.lamb[i][j])):
+                shift = sum(self._solution.dim[:j]) + k
+                power_sum += self.c[i][j] * self.a[i][shift] * self.lamb[i][j][k][0]
+                for n in range(1, len(self.lamb[i][j][k])):
+                    summands = ['{0}(x{1}{2})^{deg}'.format(self.basis[n].coef[index], j + 1, k + 1, deg=index)
+                                for index in range(len(self.basis[n].coef)) if self.basis[n].coef[index] != 0]
+                    strings.append('exp({0:.6f}*tg({repr}))'.format(self.c[i][j] * self.a[i][shift] *
+                                                               self.lamb[i][j][k][n],
+                                                               j + 1, k + 1, repr=' + '.join(summands)))
+        strings.insert(0, str(np.tanh(self.basis[0].coef[0]) ** (power_sum)))
+        return ' * '.join(strings)
+
+    def _print_F_i_transformed_recovered(self, i):
+        """
+        Returns string of recovered F function in regular polynomial form
+        :param i: an index for Y
+        :return: result string
+        """
+        strings = list()
+        power_sum = 0
+        for j in range(3):
+            for k in range(len(self.lamb[i][j])):
+                shift = sum(self._solution.dim[:j]) + k
+                diff = self.maxX[j][k] - self.minX[j][k]
+                mult_poly = pnm([ - self.minX[j][k] / diff, 1 / diff])
+                power_sum += self.c[i][j] * self.a[i][shift] * self.lamb[i][j][k][0]
+                for n in range(1, len(self.lamb[i][j][k])):
+                    res_polynomial = self.basis[n](mult_poly) + 1
+                    coeffs = res_polynomial.coef
+                    summands = ['{0}(x{1}{2})^{deg}'.format(coeffs[index], j + 1, k + 1, deg=index)
+                                for index in range(1, len(coeffs))]
+                    summands.insert(0, str(coeffs[0]))
+                    strings.append('({repr})^({0:.6f})'.format(self.c[i][j] * self.a[i][shift] * self.lamb[i][j][k][n],
+                                                               j + 1, k + 1, repr=' + '.join(summands)))
+        strings.insert(0, str((self.maxY[i] - self.minY[i]) * (1 + self.basis[0].coef[0]) ** (power_sum)))
+        return ' * '.join(strings) + ' + ' + str((2 * self.minY[i] - self.maxY[i]))
+
+    def get_results(self):
+        """
+        Generates results based on given solution
+        :return: Results string
+        """
+        self._form_lamb_lists()
+        psi_strings = ['Psi^{0}_[{1},{2}]={result}\n'.format(i + 1, j + 1, k + 1,
+                                                                   result=self._print_psi_i_jk(i,j,k))
+                       for i in range(self._solution.Y.shape[1])
+                       for j in range(3)
+                       for k in range(self._solution.dim[j])]
+        phi_strings = ['Phi^{0}_[{1}]={result}\n'.format(i + 1,j + 1,result=self._print_phi_i_j(i,j))
+                       for i in range(self._solution.Y.shape[1])
+                       for j in range(3)]
+        f_strings = ['F^{0} in special basis:\n{result}\n'.format(i + 1,result=self._print_F_i(i))
+                       for i in range(self._solution.Y.shape[1])]
+        f_strings_transformed = ['F^{0} in standard basis:\n{result}\n'.format(i + 1,result=self._print_F_i(i, mode=1))
+                       for i in range(self._solution.Y.shape[1])]
+        f_strings_transformed_denormed = ['F^{0} in standard basis '
+                                          'denormed:\n{result}\n'.format(i + 1,result=
+                                                                         self._print_F_i(i, mode=2))
+                       for i in range(self._solution.Y.shape[1])]
+        return '\n'.join(psi_strings + phi_strings + f_strings + f_strings_transformed + f_strings_transformed_denormed)
