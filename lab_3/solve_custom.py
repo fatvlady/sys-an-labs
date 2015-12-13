@@ -1,8 +1,7 @@
 from copy import deepcopy
 
-from scipy import special
-from openpyxl import Workbook
 from tabulate import tabulate as tb
+from math import pi
 
 from lab_3.system_solve import *
 from lab_3.solve import Solve
@@ -308,7 +307,7 @@ class SolveExpTh(Solve):
         for i in range(len(self.X)):
             vec = vector(self.X[i], self.deg[i])
             A = np.append(A, vec, 1)
-        self.A_log = np.matrix(np.arctan(A))
+        self.A_log = np.matrix(2/pi*np.arctan(A))
         self.A = np.exp(self.A_log)
 
     def lamb(self):
@@ -348,8 +347,8 @@ class SolveExpTh(Solve):
         self.Psi = list()
         self.Psi_arctan = list()
         for i in range(self.dim[3]):
-            self.Psi.append(np.exp(built_psi(self.Lamb[:, i])) - 1)  # Psi = exp(sum(lambda*arctan(phi))) - 1
-            self.Psi_arctan.append(np.arctan(self.Psi[-1]))
+            self.Psi.append(np.exp(built_psi(self.Lamb[:, i])) - 1)  # Psi = exp(sum(lambda*2/pi*arctan(phi))) - 1
+            self.Psi_arctan.append(2/pi*np.arctan(self.Psi[-1]))
 
 
     def built_a(self):
@@ -386,8 +385,8 @@ class SolveExpTh(Solve):
         self.Fi_arctan = list()
         self.Fi = list()
         for i in range(self.dim[3]):
-            self.Fi.append(np.exp(self.built_F1i(self.Psi_arctan[i], self.a[:, i])) - 1)  # Fi = exp(sum(a*arctan(Psi))) - 1
-            self.Fi_arctan.append(np.arctan(self.Fi[i]))
+            self.Fi.append(np.exp(self.built_F1i(self.Psi_arctan[i], self.a[:, i])) - 1)  # Fi = exp(sum(a*2/pi*arctan(Psi))) - 1
+            self.Fi_arctan.append(2/pi*np.arctan(self.Fi[i]))
 
     def built_c(self):
         self.c = np.ndarray(shape=(len(self.X), 0), dtype=float)
@@ -400,7 +399,7 @@ class SolveExpTh(Solve):
         for j in range(F.shape[1]):  # 2
             for i in range(F.shape[0]):  # 50
                 F[i, j] = self.Fi_arctan[j][i, :] * self.c[:, j]
-        self.F = np.exp(np.matrix(F)) - 1 - self.OFFSET  # F = exp(sum(c*arctan(Fi))) - 1
+        self.F = np.exp(np.matrix(F)) - 1 - self.OFFSET  # F = exp(sum(c*2/pi*arctan(Fi))) - 1
         self.norm_error = []
         for i in range(self.Y.shape[1]):
             self.norm_error.append(np.linalg.norm(self.Y[:, i] - self.F[:, i], np.inf))
