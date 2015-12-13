@@ -255,52 +255,6 @@ class PolynomialBuilderExpTh(PolynomialBuilder):
         else:
             return ' * '.join(strings) + ' - 1'
 
-    def _print_F_i_transformed(self, i):
-        """
-        Returns string of F function in regular polynomial form
-        :param i: an index for Y
-        :return: result string
-        """
-        strings = list()
-        power_sum = 0
-        for j in range(3):
-            for k in range(len(self.lamb[i][j])):
-                shift = sum(self._solution.dim[:j]) + k
-                power_sum += self.c[i][j] * self.a[i][shift] * self.lamb[i][j][k][0]
-                for n in range(1, len(self.lamb[i][j][k])):
-                    summands = ['{0}(x{1}{2})^{deg}'.format(self.basis[n].coef[index], j + 1, k + 1, deg=index)
-                                for index in range(len(self.basis[n].coef)) if self.basis[n].coef[index] != 0]
-                    strings.append('exp({0:.6f}*tg({repr}))'.format(self.c[i][j] * self.a[i][shift] *
-                                                               self.lamb[i][j][k][n],
-                                                               j + 1, k + 1, repr=' + '.join(summands)))
-        strings.insert(0, str(np.tanh(self.basis[0].coef[0]) ** (power_sum)))
-        return ' * '.join(strings)
-
-    def _print_F_i_transformed_recovered(self, i):
-        """
-        Returns string of recovered F function in regular polynomial form
-        :param i: an index for Y
-        :return: result string
-        """
-        strings = list()
-        power_sum = 0
-        for j in range(3):
-            for k in range(len(self.lamb[i][j])):
-                shift = sum(self._solution.dim[:j]) + k
-                diff = self.maxX[j][k] - self.minX[j][k]
-                mult_poly = pnm([ - self.minX[j][k] / diff, 1 / diff])
-                power_sum += self.c[i][j] * self.a[i][shift] * self.lamb[i][j][k][0]
-                for n in range(1, len(self.lamb[i][j][k])):
-                    res_polynomial = self.basis[n](mult_poly) + 1
-                    coeffs = res_polynomial.coef
-                    summands = ['{0}(x{1}{2})^{deg}'.format(coeffs[index], j + 1, k + 1, deg=index)
-                                for index in range(1, len(coeffs))]
-                    summands.insert(0, str(coeffs[0]))
-                    strings.append('({repr})^({0:.6f})'.format(self.c[i][j] * self.a[i][shift] * self.lamb[i][j][k][n],
-                                                               j + 1, k + 1, repr=' + '.join(summands)))
-        strings.insert(0, str((self.maxY[i] - self.minY[i]) * (1 + self.basis[0].coef[0]) ** (power_sum)))
-        return ' * '.join(strings) + ' + ' + str((2 * self.minY[i] - self.maxY[i]))
-
     def get_results(self):
         """
         Generates results based on given solution
