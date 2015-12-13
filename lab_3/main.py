@@ -8,9 +8,9 @@ from PyQt5.QtGui import QTextDocument, QFont
 from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog, QMessageBox
 from PyQt5.uic import loadUiType
 
-from lab_3.presentation import PolynomialBuilder
+from lab_3.presentation import PolynomialBuilder, PolynomialBuilderExpTh
 from lab_3.solve import Solve
-from lab_3.solve_custom import SolveCustom
+from lab_3.solve_custom import SolveExpTh
 from lab_3.bruteforce import BruteForceWindow
 
 app = QApplication(sys.argv)
@@ -148,9 +148,10 @@ class MainWindow(QDialog, form_class):
         self.exec_button.setEnabled(False)
         try:
             if self.custom_func_struct:
-                solver = SolveCustom(self._get_params())
+                solver = SolveExpTh(self._get_params())
                 solver.prepare()
-                self.results_field.setText(solver.show())
+                self.solution = PolynomialBuilderExpTh(solver)
+                self.results_field.setText(solver.show()+'\n\n'+self.solution.get_results())
             else:
                 solver = Solve(self._get_params())
                 solver.prepare()

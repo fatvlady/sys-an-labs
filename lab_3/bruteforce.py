@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QDialog, QMessageBox
 from PyQt5.uic import loadUiType
 
 from lab_3.calculate_optimal_degrees import *
-from lab_3.solve_custom import SolveCustom
+from lab_3.solve_custom import SolveExpTh
 from lab_3.solve import Solve
 
 form_class, base_class = loadUiType('lab_3/bruteforce_window.ui')
@@ -33,7 +33,7 @@ class BruteForceWindow(QDialog, form_class):
         self.high_edge = [self.to_1.value(), self.to_2.value(), self.to_3.value()]
         self.step = [self.st_1.value(), self.st_2.value(), self.st_3.value()]
         if self.custom_struct:
-            solver = SolveCustom(self.params)
+            solver = SolveExpTh(self.params)
         else:
             solver = Solve(self.params)
         p = [[i for i in range(self.low_edge[j], self.high_edge[j]+1, self.step[j])] for j in range(len(self.step))]
