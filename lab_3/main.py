@@ -150,7 +150,8 @@ class MainWindow(QDialog, form_class):
             if self.custom_func_struct:
                 solver = SolveExpTh(self._get_params())
                 solver.prepare()
-                self.results_field.setText(solver.show())
+                self.solution = PolynomialBuilder(solver)
+                self.results_field.setText(solver.show()+'\n\n'+self.solution.get_results())
             else:
                 solver = Solve(self._get_params())
                 solver.prepare()

@@ -7,7 +7,7 @@ from lab_3.system_solve import *
 from lab_3.solve import Solve
 
 
-class SolveExpTh1(Solve):
+class SolveExpTh(Solve):
 
     def built_B(self):
         def B_average():
@@ -232,7 +232,7 @@ class SolveExpTh1(Solve):
         return '\n'.join(text)
 
 
-class SolveExpTh(Solve):
+class SolveExpTh1(Solve):
 
     def built_B(self):
         def B_average():
