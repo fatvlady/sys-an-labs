@@ -10,7 +10,7 @@ from PyQt5.uic import loadUiType
 
 from lab_3.presentation import PolynomialBuilder
 from lab_3.solve import Solve
-from lab_3.solve_custom import SolveCustom
+from lab_3.solve_custom import SolveExpTh
 from lab_3.bruteforce import BruteForceWindow
 
 app = QApplication(sys.argv)
@@ -148,7 +148,7 @@ class MainWindow(QDialog, form_class):
         self.exec_button.setEnabled(False)
         try:
             if self.custom_func_struct:
-                solver = SolveCustom(self._get_params())
+                solver = SolveExpTh(self._get_params())
                 solver.prepare()
                 self.results_field.setText(solver.show())
             else:

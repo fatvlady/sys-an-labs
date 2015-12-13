@@ -7,7 +7,7 @@ from tabulate import tabulate as tb
 from lab_3.system_solve import *
 
 
-class SolveCustom(object):
+class SolveExpTh(object):
     OFFSET = 1e-10
 
     def __init__(self, d):
@@ -170,8 +170,8 @@ class SolveCustom(object):
         for i in range(len(self.X)):
             vec = vector(self.X[i], self.deg[i])
             A = np.append(A, vec, 1)
-        self.A = np.matrix(np.tanh(A))
-        self.A_log = np.log(self.A + 1 + self.OFFSET)
+        self.A_log = np.matrix(np.tanh(A))
+        self.A = np.exp(self.A_log)
 
     def lamb(self):
         lamb = np.ndarray(shape=(self.A.shape[1], 0), dtype=float)
@@ -207,20 +207,21 @@ class SolveCustom(object):
                     l += 1
             return np.matrix(psi)
 
-        self.Psi_log = []  # as list because psi[i] is matrix(not vector)
         self.Psi = list()
+        self.Psi_tanh = list()
         for i in range(self.dim[3]):
-            self.Psi.append(np.exp(built_psi(self.Lamb[:, i])) - 1 - self.OFFSET)
-            self.Psi_log.append(np.log(np.tanh(self.Psi[i]) + 1 + self.OFFSET))
+            self.Psi.append(np.exp(built_psi(self.Lamb[:, i])) - 1)  # Psi = exp(sum(lambda*tanh(phi))) - 1
+            self.Psi_tanh.append(np.tanh(self.Psi[-1]))
+
 
     def built_a(self):
         self.a = np.ndarray(shape=(self.mX, 0), dtype=float)
         for i in range(self.dim[3]):
-            a1 = self._minimize_equation(self.Psi_log[i][:, :self.dim_integral[0]],
+            a1 = self._minimize_equation(self.Psi_tanh[i][:, :self.dim_integral[0]],
                                          np.log(self.Y[:, i] + 1 + self.OFFSET))
-            a2 = self._minimize_equation(self.Psi_log[i][:, self.dim_integral[0]:self.dim_integral[1]],
+            a2 = self._minimize_equation(self.Psi_tanh[i][:, self.dim_integral[0]:self.dim_integral[1]],
                                          np.log(self.Y[:, i] + 1 + self.OFFSET))
-            a3 = self._minimize_equation(self.Psi_log[i][:, self.dim_integral[1]:],
+            a3 = self._minimize_equation(self.Psi_tanh[i][:, self.dim_integral[1]:],
                                          np.log(self.Y[:, i] + 1 + self.OFFSET))
             # temp = self._minimize_equation(self.Psi[i], self.Y[:, i])
             # self.a = np.append(self.a, temp, axis=1)
@@ -244,25 +245,24 @@ class SolveCustom(object):
         return np.matrix(F1i)
 
     def built_Fi(self):
-        self.Fi_log = []
+        self.Fi_tanh = list()
         self.Fi = list()
         for i in range(self.dim[3]):
-            self.Fi.append(np.exp(self.built_F1i(self.Psi_log[i], self.a[:, i])) - 1 - self.OFFSET)
-            self.Fi_log.append(np.log(np.tanh(self.Fi[i]) + 1 + self.OFFSET))
+            self.Fi.append(np.exp(self.built_F1i(self.Psi_tanh[i], self.a[:, i])) - 1)  # Fi = exp(sum(a*tanh(Psi))) - 1
+            self.Fi_tanh.append(np.tanh(self.Fi[i]))
 
     def built_c(self):
         self.c = np.ndarray(shape=(len(self.X), 0), dtype=float)
         for i in range(self.dim[3]):
-            self.c = np.append(self.c, self._minimize_equation(self.Fi_log[i], np.log(self.Y[:, i] + 1 + self.OFFSET))
+            self.c = np.append(self.c, self._minimize_equation(self.Fi_tanh[i], np.log(self.Y[:, i] + 1 + self.OFFSET))
                                , axis=1)
 
     def built_F(self):
         F = np.ndarray(self.Y.shape, dtype=float)
         for j in range(F.shape[1]):  # 2
             for i in range(F.shape[0]):  # 50
-                F[i, j] = self.Fi_log[j][i, :] * self.c[:, j]
-        self.F_log = np.matrix(F)
-        self.F = np.exp(self.F_log) - 1 - self.OFFSET
+                F[i, j] = self.Fi_tanh[j][i, :] * self.c[:, j]
+        self.F = np.exp(np.matrix(F)) - 1 - self.OFFSET  # F = exp(sum(c*tanh(Fi))) - 1
         self.norm_error = []
         for i in range(self.Y.shape[1]):
             self.norm_error.append(np.linalg.norm(self.Y[:, i] - self.F[:, i], np.inf))

@@ -1,4 +1,4 @@
-from lab_3.solve import *
+import numpy as np
 
 
 def determine_deg(a, p1, p2, p3):
@@ -12,6 +12,7 @@ def determine_deg(a, p1, p2, p3):
         for j in p2:
             for k in p3:
                 a.deg = [i + 1, j + 1, k + 1]
+                print a.deg
                 a.built_A()
                 a.lamb()
                 a.psi()
