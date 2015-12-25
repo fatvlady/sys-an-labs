@@ -71,6 +71,10 @@ class Solve(object):
         X3 = self.data[:, self.dim_integral[1]:self.dim_integral[2]]
         # matrix of vectors i.e.X = [[X11,X12],[X21],...]
         self.X = [X1, X2, X3]
+        self.minX = np.min(self.datas[:, :self.dim_integral[2]].A, axis=0)
+        self.maxX = np.max(self.datas[:, :self.dim_integral[2]].A, axis=0)
+        self.minY = np.min(self.datas[:, self.dim_integral[2]:].A, axis=0)
+        self.maxY = np.max(self.datas[:, self.dim_integral[2]:].A, axis=0)
         # number columns in matrix X
         self.mX = self.dim_integral[2]
         # matrix, that consists of i.e. Y1,Y2
@@ -115,11 +119,11 @@ class Solve(object):
         elif self.poly_type == 'sh_cheb_2':
             self.poly_f = lambda deg, x: special.eval_sh_chebyu(deg, x) / (deg + 1)
         elif self.poly_type == 'sin':
-            self.poly_f = lambda deg, x: ((np.sin(x)+ np.pi)/(2*np.pi))^deg
+            self.poly_f = lambda deg, x: ((np.sin(x) + np.pi) / (2 * np.pi)) ^ deg
         elif self.poly_type == 'cos':
-            self.poly_f = lambda x: (np.cos(x)+ np.pi)/(2*np.pi)
+            self.poly_f = lambda deg, x: (np.cos(x) + np.pi) / (2 * np.pi)
         elif self.poly_type == 'arctg':
-            self.poly_f = lambda x: (np.arctan(x)+np.pi/2)/np.pi
+            self.poly_f = lambda deg, x: (np.arctan(x) + np.pi / 2) / np.pi
 
     def built_A(self):
         """
@@ -413,7 +417,6 @@ class Solve(object):
         text.append('\nY rebuilt :')
         text.append(tb(self.F_.tolist()))
 
-
         return '\n'.join(text)
 
     def prepare(self):
@@ -432,3 +435,32 @@ class Solve(object):
         self.built_F_()
         self.show()
         self.save_to_file()
+        print(self.calculate_value([0.3120, 6.3, -5.3, 1.6536, -14, -9]))
+
+    def aggregate(self, values, coeffs):
+        return np.exp(np.dot(np.log(1 + values + self.OFFSET), coeffs)) - 1
+
+    def calculate_value(self, X):
+        def calculate_polynomials(value, deg_lim):  # deg_lim is not reached
+            return np.array([self.poly_f(deg, value) for deg in range(deg_lim)]).T
+
+        X = np.array(X)
+        X = (X - self.minX) / (self.maxX - self.minX)
+        X = np.split(X, self.dim_integral[:2])
+        phi = np.array([calculate_polynomials(vector, self.deg[i]) for i, vector in enumerate(X)])
+        psi = list()
+        shift = 0
+        for i in range(3):
+            for j in range(self.dim[i]):
+                psi.append(self.aggregate(phi[i, j], self.Lamb.A[shift: shift + self.deg[i]]))
+                shift += self.deg[i]
+        psi = np.array(psi).T
+        big_phi = list()
+        for i in range(3):
+            big_phi.append([self.aggregate(psi[k, (self.dim_integral[i - 1] if i > 0 else 0): self.dim_integral[i]],
+                                           self.a.A[(self.dim_integral[i - 1] if i > 0 else 0):
+                                           self.dim_integral[i], k]) for k in range(self.dim[3])])
+        big_phi = np.array(big_phi).T
+        result = np.array([self.aggregate(big_phi[k], self.c.A[:, k]) for k in range(self.dim[3])])
+        result = result * (self.maxY - self.minY) + self.minY
+        return result

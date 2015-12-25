@@ -35,7 +35,6 @@ def forecast(x, steps):
 
     t = mod.forecast(steps)[0]
 
-    axis = np.arange(1, x.shape[0] + 1)
     forecast_res = np.zeros(x.shape[0])
     for k in xrange(x.shape[0] - steps):
         forecast_res[k] = x[k]

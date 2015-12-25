@@ -179,6 +179,9 @@ class SolveExpTh(Solve):
         for i in range(self.Y.shape[1]):
             self.norm_error.append(np.linalg.norm(self.Y[:, i] - self.F[:, i], np.inf))
 
+    def aggregate(self, values, coeffs):
+        return np.exp(np.dot(np.tanh(values), coeffs)) - 1
+
     def show(self):
         text = []
         text.append('\nError normalised (Y - F)')
@@ -187,48 +190,48 @@ class SolveExpTh(Solve):
         text.append('\nError (Y_ - F_))')
         text.append(tb([self.error]))
 
-        # text.append('Input data: X')
-        # text.append(tb(np.array(self.datas[:, :self.dim_integral[2]])))
-        #
-        # text.append('\nInput data: Y')
-        # text.append(tb(np.array(self.datas[:, self.dim_integral[2]:self.dim_integral[3]])))
-        #
-        # text.append('\nX normalised:')
-        # text.append(tb(np.array(self.data[:, :self.dim_integral[2]])))
-        #
-        # text.append('\nY normalised:')
-        # text.append(tb(np.array(self.data[:, self.dim_integral[2]:self.dim_integral[3]])))
-        #
-        # text.append('\nmatrix B:')
-        # text.append(tb(np.array(self.B)))
-        #
-        # # text.append('\nmatrix A:')
-        # # text.append(tb(np.array(self.A)))
-        #
-        # text.append('\nmatrix Lambda:')
-        # text.append(tb(np.array(self.Lamb)))
-        #
-        # for j in range(len(self.Psi)):
-        #     s = '\nmatrix Psi%i:' % (j + 1)
-        #     text.append(s)
-        #     text.append(tb(np.array(self.Psi[j])))
-        #
-        # text.append('\nmatrix a:')
-        # text.append(tb(self.a.tolist()))
-        #
-        # for j in range(len(self.Fi)):
-        #     s = '\nmatrix F%i:' % (j + 1)
-        #     text.append(s)
-        #     text.append(tb(np.array(self.Fi[j])))
-        #
-        # text.append('\nmatrix c:')
-        # text.append(tb(np.array(self.c)))
-        #
-        # text.append('\nY rebuilt normalized :')
-        # text.append(tb(np.array(self.F)))
-        #
-        # text.append('\nY rebuilt :')
-        # text.append(tb(self.F_.tolist()))
+        text.append('Input data: X')
+        text.append(tb(np.array(self.datas[:, :self.dim_integral[2]])))
+
+        text.append('\nInput data: Y')
+        text.append(tb(np.array(self.datas[:, self.dim_integral[2]:self.dim_integral[3]])))
+
+        text.append('\nX normalised:')
+        text.append(tb(np.array(self.data[:, :self.dim_integral[2]])))
+
+        text.append('\nY normalised:')
+        text.append(tb(np.array(self.data[:, self.dim_integral[2]:self.dim_integral[3]])))
+
+        text.append('\nmatrix B:')
+        text.append(tb(np.array(self.B)))
+
+        # text.append('\nmatrix A:')
+        # text.append(tb(np.array(self.A)))
+
+        text.append('\nmatrix Lambda:')
+        text.append(tb(np.array(self.Lamb)))
+
+        for j in range(len(self.Psi)):
+            s = '\nmatrix Psi%i:' % (j + 1)
+            text.append(s)
+            text.append(tb(np.array(self.Psi[j])))
+
+        text.append('\nmatrix a:')
+        text.append(tb(self.a.tolist()))
+
+        for j in range(len(self.Fi)):
+            s = '\nmatrix F%i:' % (j + 1)
+            text.append(s)
+            text.append(tb(np.array(self.Fi[j])))
+
+        text.append('\nmatrix c:')
+        text.append(tb(np.array(self.c)))
+
+        text.append('\nY rebuilt normalized :')
+        text.append(tb(np.array(self.F)))
+
+        text.append('\nY rebuilt :')
+        text.append(tb(self.F_.tolist()))
         return '\n'.join(text)
 
 

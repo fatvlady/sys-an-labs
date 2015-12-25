@@ -32,7 +32,7 @@ class PolynomialBuilder(object):
         self.minY = solution.Y_.min(axis=0).getA1()
         self.maxY = solution.Y_.max(axis=0).getA1()
 
-    def _form_psi(self):
+    def _form_lamb_lists(self):
         """
         Generates specific basis coefficients for Psi functions
         """
