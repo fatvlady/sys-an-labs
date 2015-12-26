@@ -1,5 +1,7 @@
 from copy import deepcopy
 import numpy as np
+import matplotlib.pyplot as plt
+from forecast_arima import forecast
 from scipy import special
 from openpyxl import Workbook
 from tabulate import tabulate as tb
@@ -435,7 +437,6 @@ class Solve(object):
         self.built_F_()
         self.show()
         self.save_to_file()
-        print(self.calculate_value([0.3120, 6.3, -5.3, 1.6536, -14, -9]))
 
     def aggregate(self, values, coeffs):
         return np.exp(np.dot(np.log(1 + values + self.OFFSET), coeffs)) - 1
@@ -452,7 +453,7 @@ class Solve(object):
         shift = 0
         for i in range(3):
             for j in range(self.dim[i]):
-                psi.append(self.aggregate(phi[i, j], self.Lamb.A[shift: shift + self.deg[i]]))
+                psi.append(self.aggregate(phi[i][j], self.Lamb.A[shift: shift + self.deg[i]]))
                 shift += self.deg[i]
         psi = np.array(psi).T
         big_phi = list()
@@ -464,3 +465,23 @@ class Solve(object):
         result = np.array([self.aggregate(big_phi[k], self.c.A[:, k]) for k in range(self.dim[3])])
         result = result * (self.maxY - self.minY) + self.minY
         return result
+
+    def build_predicted(self, steps):
+        XF = list()
+        for i, x in enumerate(self.X_):
+            xf = list()
+            for j, xc in enumerate(x.T):
+                xf.append(forecast(xc.getA1(), steps))
+            XF.append(xf)
+        yf = list()
+        for s in range(1, steps + 1):
+            x = list()
+            for xf in XF:
+                for xfc in xf:
+                    x.append(xfc[-s])
+            yf.append(self.calculate_value(x))
+        YF = self.Y_.copy().getA()
+        YF[-steps:] = np.array(yf)
+        return XF, YF
+
+

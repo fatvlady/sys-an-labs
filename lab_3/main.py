@@ -137,8 +137,12 @@ class MainWindow(QDialog, form_class):
     @pyqtSlot()
     def plot_clicked(self):
         if self.solution:
+            arima_st = self.predictBox.value()
             try:
-                self.solution.plot_graphs()
+                if arima_st > 0:
+                    self.solution.plot_graphs_with_prediction(arima_st)
+                else:
+                    self.solution.plot_graphs()
             except Exception as e:
                 QMessageBox.warning(self,'Error!','Error happened during plotting: ' + str(e))
         return

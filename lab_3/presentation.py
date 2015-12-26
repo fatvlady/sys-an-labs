@@ -192,6 +192,28 @@ class PolynomialBuilder(object):
         manager = plt.get_current_fig_manager()
         manager.set_window_title('Graph')
 
+    def compare_vals(name, real, predicted, reconstructed=None):
+        fig = plt.figure()
+        axes = plt.axes()
+        r = np.arange(len(real))
+        axes.set_title(name)
+        axes.set_xlim(0, len(real))
+        axes.grid()
+        axes.plot(r, predicted, label='predicted')
+        if reconstructed != None:
+            axes.plot(r, reconstructed, label='reconstructed')
+        axes.plot(r, real, label='real')
+        axes.legend(loc='upper right', fontsize=16)
+        fig.show()
+
+    def plot_graphs_with_prediction(self, steps):
+        XF, YF = self._solution.build_predicted(steps)
+        for i, x in enumerate(self._solution.X_):
+            for j, xc in enumerate(x.T):
+                self.compare_vals('X{}{}'.format(i + 1, j + 1), xc.getA1(), XF[i][j])
+        for i in range(self._solution.dim[3]):
+            self.compare_vals('Y{}'.format(i + 1), self._solution.Y_[:, i].getA1(), YF[:, i],
+                              self._solution.F_[:, i].getA1())
 
 
 class PolynomialBuilderExpTh(PolynomialBuilder):
