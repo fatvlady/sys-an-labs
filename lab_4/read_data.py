@@ -1,9 +1,9 @@
+import pandas as pd
 
-def read_data():
-    f = open(filename, 'r')
-    data = []
-    for line in f:
-        newline = str(line)
-        data.append([float(i) for i in newline.split()])
-    f.close()
-    return data
+
+def read_data(filename = 'norm.xlsx'):
+    xl_file = pd.ExcelFile(filename)
+    dfs = {sheetname: xl_file.parse(sheetname) for sheetname in xl_file.sheet_names}
+    dfs['t']=dfs[xl_file.sheet_names[0]].T.columns.values.tolist()
+    return dfs
+read_data('data/norm.xlsx')
