@@ -1,4 +1,5 @@
 from copy import deepcopy
+from read_data import read_data
 import numpy as np
 import matplotlib.pyplot as plt
 from forecast_arima import forecast
@@ -13,7 +14,7 @@ class Solve(object):
     OFFSET = 1e-10
 
     def __init__(self, d):
-        self.n = d['samples']
+        self.n02 = d['samples']
         self.dim = d['dimensions']
         self.filename_input = d['input_file']
         self.filename_output = d['output_file']
@@ -26,10 +27,9 @@ class Solve(object):
         self.error = 0.0
 
     def define_data(self):
-        f = open(self.filename_input, 'r')
-        # all data from file_input in float
-        self.datas = [list(map(lambda x: float(x), f.readline().split())) for i in range(self.n)]
+        self.t, self.datas = read_data(self.filename_input)
         self.datas = np.matrix(self.datas)
+        self.n = len(self.t)
         # list of sum degrees [ 3,1,2] -> [3,4,6]
         self.dim_integral = [sum(self.dim[:i + 1]) for i in range(len(self.dim))]
 

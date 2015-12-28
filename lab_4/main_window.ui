@@ -130,7 +130,7 @@
          <item row="2" column="1">
           <widget class="QSpinBox" name="x3_deg">
            <property name="value">
-            <number>1</number>
+            <number>5</number>
            </property>
           </widget>
          </item>
@@ -147,7 +147,7 @@
          <item row="1" column="1">
           <widget class="QSpinBox" name="x2_deg">
            <property name="value">
-            <number>1</number>
+            <number>6</number>
            </property>
           </widget>
          </item>
@@ -164,7 +164,7 @@
          <item row="0" column="1">
           <widget class="QSpinBox" name="x1_deg">
            <property name="value">
-            <number>1</number>
+            <number>7</number>
            </property>
           </widget>
          </item>
@@ -206,7 +206,7 @@
       <item row="0" column="1">
        <widget class="QSpinBox" name="x1_dim">
         <property name="value">
-         <number>2</number>
+         <number>7</number>
         </property>
        </widget>
       </item>
@@ -223,7 +223,7 @@
       <item row="3" column="1">
        <widget class="QSpinBox" name="y_dim">
         <property name="value">
-         <number>2</number>
+         <number>3</number>
         </property>
        </widget>
       </item>
@@ -250,14 +250,14 @@
       <item row="1" column="1">
        <widget class="QSpinBox" name="x2_dim">
         <property name="value">
-         <number>2</number>
+         <number>6</number>
         </property>
        </widget>
       </item>
       <item row="2" column="1">
        <widget class="QSpinBox" name="x3_dim">
         <property name="value">
-         <number>2</number>
+         <number>5</number>
         </property>
        </widget>
       </item>
@@ -304,39 +304,32 @@
      </layout>
     </widget>
    </item>
+   <item row="2" column="0" colspan="3">
+    <widget class="QTextBrowser" name="results_field">
+     <property name="lineWrapMode">
+      <enum>QTextEdit::WidgetWidth</enum>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+     <property name="html">
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'.Menio Regular'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="placeholderText">
+      <string>Results are shown here</string>
+     </property>
+    </widget>
+   </item>
    <item row="0" column="2">
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
       <string>Data</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_5">
-      <item row="0" column="0">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Samples:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QSpinBox" name="sample_spin">
-        <property name="maximum">
-         <number>999</number>
-        </property>
-        <property name="value">
-         <number>45</number>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLineEdit" name="line_input">
-        <property name="text">
-         <string>data_3_dst.txt</string>
-        </property>
-        <property name="placeholderText">
-         <string>Input file</string>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="1">
        <widget class="QToolButton" name="select_input">
         <property name="text">
@@ -361,27 +354,34 @@
         </property>
        </widget>
       </item>
+      <item row="1" column="0">
+       <widget class="QLineEdit" name="line_input">
+        <property name="text">
+         <string>norm.xlsx</string>
+        </property>
+        <property name="placeholderText">
+         <string>Input file</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QSpinBox" name="sample_spin">
+        <property name="maximum">
+         <number>999</number>
+        </property>
+        <property name="value">
+         <number>50</number>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Samples:</string>
+        </property>
+       </widget>
+      </item>
      </layout>
-    </widget>
-   </item>
-   <item row="2" column="0" colspan="3">
-    <widget class="QTextBrowser" name="results_field">
-     <property name="lineWrapMode">
-      <enum>QTextEdit::WidgetWidth</enum>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-     <property name="html">
-      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.SF NS Text'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'.Menio Regular'; font-size:10pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-     </property>
-     <property name="placeholderText">
-      <string>Results are shown here</string>
-     </property>
     </widget>
    </item>
   </layout>
@@ -433,22 +433,6 @@ p, li { white-space: pre-wrap; }
     <hint type="sourcelabel">
      <x>526</x>
      <y>219</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>309</x>
-     <y>199</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>sample_spin</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>Form</receiver>
-   <slot>samples_modified(int)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>568</x>
-     <y>53</y>
     </hint>
     <hint type="destinationlabel">
      <x>309</x>
@@ -773,6 +757,22 @@ p, li { white-space: pre-wrap; }
     <hint type="destinationlabel">
      <x>370</x>
      <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sample_spin</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>Form</receiver>
+   <slot>samples_modified(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>568</x>
+     <y>53</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>309</x>
+     <y>199</y>
     </hint>
    </hints>
   </connection>

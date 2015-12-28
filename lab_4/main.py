@@ -59,7 +59,7 @@ class MainWindow(QDialog, form_class):
 
     @pyqtSlot()
     def input_clicked(self):
-        filename = QFileDialog.getOpenFileName(self, 'Open data file', '.', 'Data file (*.txt *.dat)')[0]
+        filename = QFileDialog.getOpenFileName(self, 'Open data file', '.', 'Data file (*.xlsx)')[0]
         if filename == '':
             return
         if filename != self.input_path:
