@@ -170,6 +170,9 @@
          </item>
          <item row="3" column="0" colspan="2">
           <widget class="QPushButton" name="bruteforce_btn">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="text">
             <string>Determine</string>
            </property>
@@ -205,6 +208,9 @@
       </item>
       <item row="0" column="1">
        <widget class="QSpinBox" name="x1_dim">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="value">
          <number>7</number>
         </property>
@@ -222,6 +228,9 @@
       </item>
       <item row="3" column="1">
        <widget class="QSpinBox" name="y_dim">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="value">
          <number>3</number>
         </property>
@@ -249,6 +258,9 @@
       </item>
       <item row="1" column="1">
        <widget class="QSpinBox" name="x2_dim">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="value">
          <number>6</number>
         </property>
@@ -256,6 +268,9 @@
       </item>
       <item row="2" column="1">
        <widget class="QSpinBox" name="x3_dim">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="value">
          <number>5</number>
         </property>
@@ -279,6 +294,9 @@
       </item>
       <item>
        <widget class="QComboBox" name="weights_box">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="currentIndex">
          <number>1</number>
         </property>
@@ -296,6 +314,9 @@
       </item>
       <item>
        <widget class="QCheckBox" name="lambda_check">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="text">
          <string>Use 3-block lambda calculation</string>
         </property>
@@ -377,7 +398,7 @@ p, li { white-space: pre-wrap; }
       <item row="0" column="0">
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>Samples:</string>
+         <string>Samples(N02: from 40 to 70)</string>
         </property>
        </widget>
       </item>

@@ -1,5 +1,5 @@
 from copy import deepcopy
-from read_data import read_data
+from lab_4.read_data import read_data
 import numpy as np
 import matplotlib.pyplot as plt
 from forecast_arima import forecast
@@ -15,6 +15,8 @@ class Solve(object):
 
     def __init__(self, d):
         self.n02 = d['samples']
+        if self.n02 >70 and self.n02<40:
+            raise Exception('Samples n02 not in range(40,70)')
         self.dim = d['dimensions']
         self.filename_input = d['input_file']
         self.filename_output = d['output_file']
