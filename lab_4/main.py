@@ -8,9 +8,7 @@ from PyQt5.QtGui import QTextDocument, QFont
 from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog, QMessageBox
 from PyQt5.uic import loadUiType
 
-from lab_4.presentation import PolynomialBuilder, PolynomialBuilderExpTh
-from lab_4.solve import Solve
-from lab_4.solve_custom import SolveExpTh
+from lab_4.solver_manager import SolverManager
 from lab_4.bruteforce import BruteForceWindow
 
 app = QApplication(sys.argv)
@@ -47,7 +45,7 @@ class MainWindow(QDialog, form_class):
         self.samples_num = self.sample_spin.value()
         self.lambda_multiblock = self.lambda_check.isChecked()
         self.weight_method = self.weights_box.currentText().lower()
-        self.solution = None
+        self.manager = None
         return
 
     @pyqtSlot()
@@ -129,13 +127,9 @@ class MainWindow(QDialog, form_class):
 
     @pyqtSlot()
     def plot_clicked(self):
-        if self.solution:
-            arima_st = self.predictBox.value()
+        if self.manager:
             try:
-                if arima_st > 0:
-                    self.solution.plot_graphs_with_prediction(arima_st)
-                else:
-                    self.solution.plot_graphs()
+                self.manager.plot(self.predictBox.value())
             except Exception as e:
                 QMessageBox.warning(self,'Error!','Error happened during plotting: ' + str(e))
         return
@@ -144,16 +138,9 @@ class MainWindow(QDialog, form_class):
     def exec_clicked(self):
         self.exec_button.setEnabled(False)
         try:
-            if self.custom_func_struct:
-                solver = SolveExpTh(self._get_params())
-                solver.prepare()
-                self.solution = PolynomialBuilderExpTh(solver)
-                # self.results_field.setText(solver.show()+'\n\n'+self.solution.get_results())
-            else:
-                solver = Solve(self._get_params())
-                solver.prepare()
-                self.solution = PolynomialBuilder(solver)
-                # self.results_field.setText(solver.show()+'\n\n'+self.solution.get_results())
+            self.manager = SolverManager(self._get_params())
+            self.manager.prepare(self.input_path)
+            self.manager.fit(1, self.samples_num)
         except Exception as e:
             QMessageBox.warning(self,'Error!','Error happened during execution: ' + str(e))
         self.exec_button.setEnabled(True)
@@ -182,13 +169,14 @@ class MainWindow(QDialog, form_class):
         return
 
     def _get_params(self):
-        return dict(poly_type=self.type, degrees=self.degrees, dimensions=self.dimensions,
-                    samples=self.samples_num, input_file=self.input_path, output_file=self.output_path,
+        return dict(custom_struct=self.custom_func_struct,poly_type=self.type, degrees=self.degrees,
+                    dimensions=self.dimensions,
+                    samples=self.samples_num, output_file=self.output_path,
                     weights=self.weight_method, lambda_multiblock=self.lambda_multiblock)
 
 
 # -----------------------------------------------------#
 form = MainWindow()
-form.setWindowTitle('System Analysis - Lab 3')
+form.setWindowTitle('System Analysis - Lab 4')
 form.show()
 sys.exit(app.exec_())

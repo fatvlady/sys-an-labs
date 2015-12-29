@@ -190,6 +190,7 @@ class PolynomialBuilder(object):
 
         manager = plt.get_current_fig_manager()
         manager.set_window_title('Graph')
+        fig.show()
 
     def compare_vals(name, real, predicted, reconstructed=None):
         fig = plt.figure()
