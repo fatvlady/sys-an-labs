@@ -358,7 +358,7 @@
       <item row="1" column="0">
        <widget class="QLineEdit" name="line_input">
         <property name="text">
-         <string>lab_4/data/norm.xlsx</string>
+         <string>lab_4/data/norm_final.xlsx</string>
         </property>
         <property name="placeholderText">
          <string>Input file</string>
