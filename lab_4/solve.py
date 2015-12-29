@@ -1,13 +1,12 @@
 from copy import deepcopy
-from lab_4.read_data import read_data
-import numpy as np
-import matplotlib.pyplot as plt
-from forecast_arima import forecast
+
 from scipy import special
 from openpyxl import Workbook
 from tabulate import tabulate as tb
 
-from lab_3.system_solve import *
+from lab_4.read_data import read_data
+from forecast_arima import forecast
+from lab_4.system_solve import *
 
 
 class Solve(object):

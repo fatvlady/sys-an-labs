@@ -3,8 +3,8 @@ from copy import deepcopy
 from tabulate import tabulate as tb
 from math import pi
 
-from lab_3.system_solve import *
-from lab_3.solve import Solve
+from lab_4.system_solve import *
+from lab_4.solve import Solve
 
 
 class SolveExpTh(Solve):

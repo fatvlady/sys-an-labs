@@ -8,14 +8,14 @@ from PyQt5.QtGui import QTextDocument, QFont
 from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog, QMessageBox
 from PyQt5.uic import loadUiType
 
-from lab_3.presentation import PolynomialBuilder, PolynomialBuilderExpTh
-from lab_3.solve import Solve
-from lab_3.solve_custom import SolveExpTh
-from lab_3.bruteforce import BruteForceWindow
+from lab_4.presentation import PolynomialBuilder, PolynomialBuilderExpTh
+from lab_4.solve import Solve
+from lab_4.solve_custom import SolveExpTh
+from lab_4.bruteforce import BruteForceWindow
 
 app = QApplication(sys.argv)
-app.setApplicationName('lab3_sa')
-form_class, base_class = loadUiType('lab_3/main_window.ui')
+app.setApplicationName('lab4_sa')
+form_class, base_class = loadUiType('lab_4/main_window.ui')
 
 
 class MainWindow(QDialog, form_class):
@@ -48,13 +48,6 @@ class MainWindow(QDialog, form_class):
         self.lambda_multiblock = self.lambda_check.isChecked()
         self.weight_method = self.weights_box.currentText().lower()
         self.solution = None
-        doc = self.results_field.document()
-        assert isinstance(doc, QTextDocument)
-        font = doc.defaultFont()
-        assert isinstance(font, QFont)
-        font.setFamily('Courier New')
-        font.setPixelSize(12)
-        doc.setDefaultFont(font)
         return
 
     @pyqtSlot()
@@ -155,12 +148,12 @@ class MainWindow(QDialog, form_class):
                 solver = SolveExpTh(self._get_params())
                 solver.prepare()
                 self.solution = PolynomialBuilderExpTh(solver)
-                self.results_field.setText(solver.show()+'\n\n'+self.solution.get_results())
+                # self.results_field.setText(solver.show()+'\n\n'+self.solution.get_results())
             else:
                 solver = Solve(self._get_params())
                 solver.prepare()
                 self.solution = PolynomialBuilder(solver)
-                self.results_field.setText(solver.show()+'\n\n'+self.solution.get_results())
+                # self.results_field.setText(solver.show()+'\n\n'+self.solution.get_results())
         except Exception as e:
             QMessageBox.warning(self,'Error!','Error happened during execution: ' + str(e))
         self.exec_button.setEnabled(True)

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>742</width>
+    <width>758</width>
     <height>650</height>
    </rect>
   </property>
@@ -358,7 +358,7 @@
       <item row="1" column="0">
        <widget class="QLineEdit" name="line_input">
         <property name="text">
-         <string>norm.xlsx</string>
+         <string>lab_4/data/norm.xlsx</string>
         </property>
         <property name="placeholderText">
          <string>Input file</string>
@@ -386,7 +386,17 @@
     </widget>
    </item>
    <item row="2" column="0" colspan="3">
-    <widget class="QTableView" name="tableView"/>
+    <widget class="QTableView" name="tableView">
+     <property name="horizontalScrollBarPolicy">
+      <enum>Qt::ScrollBarAlwaysOff</enum>
+     </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::NoEditTriggers</set>
+     </property>
+     <property name="alternatingRowColors">
+      <bool>true</bool>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
