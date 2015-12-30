@@ -25,3 +25,6 @@ class SolverManager(object):
             self.presenter.plot_graphs_with_prediction(steps)
         else:
             self.presenter.plot_graphs()
+
+    def predict(self, steps):
+        pass
