@@ -13,46 +13,7 @@
   <property name="windowTitle">
    <string>Form1</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0,0" columnstretch="0,0,0">
-   <item row="1" column="2">
-    <widget class="QGroupBox" name="groupBox_6">
-     <property name="title">
-      <string>Processing</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="0" rowspan="2" colspan="2">
-       <widget class="QPushButton" name="exec_button">
-        <property name="text">
-         <string>Execute</string>
-        </property>
-        <property name="default">
-         <bool>true</bool>
-        </property>
-        <property name="flat">
-         <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2" rowspan="2" colspan="2">
-       <widget class="QPushButton" name="plot_button">
-        <property name="text">
-         <string>Plot</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_10">
-        <property name="text">
-         <string>Prediction steps:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="2">
-       <widget class="QSpinBox" name="predictBox"/>
-      </item>
-     </layout>
-    </widget>
-   </item>
+  <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,0,0" columnstretch="0,0,0,0">
    <item row="0" column="0">
     <widget class="QGroupBox" name="groupBox_5">
      <property name="title">
@@ -325,7 +286,7 @@
      </layout>
     </widget>
    </item>
-   <item row="0" column="2">
+   <item row="1" column="2">
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
       <string>Data</string>
@@ -365,27 +326,10 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QSpinBox" name="sample_spin">
-        <property name="maximum">
-         <number>999</number>
-        </property>
-        <property name="value">
-         <number>50</number>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>Samples(N02: from 40 to 70)</string>
-        </property>
-       </widget>
-      </item>
      </layout>
     </widget>
    </item>
-   <item row="2" column="0" colspan="3">
+   <item row="2" column="0" colspan="4">
     <widget class="QTableView" name="tableView">
      <property name="horizontalScrollBarPolicy">
       <enum>Qt::ScrollBarAlwaysOff</enum>
@@ -396,6 +340,59 @@
      <property name="alternatingRowColors">
       <bool>true</bool>
      </property>
+    </widget>
+   </item>
+   <item row="0" column="2">
+    <widget class="QGroupBox" name="groupBox_6">
+     <property name="title">
+      <string>Processing</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0" rowspan="2" colspan="3">
+       <widget class="QPushButton" name="exec_button">
+        <property name="text">
+         <string>Execute</string>
+        </property>
+        <property name="default">
+         <bool>true</bool>
+        </property>
+        <property name="flat">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2">
+       <widget class="QSpinBox" name="predictBox">
+        <property name="value">
+         <number>10</number>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_10">
+        <property name="text">
+         <string>Prediction steps:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Learning set size (N_02)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QSpinBox" name="sample_spin">
+        <property name="maximum">
+         <number>999</number>
+        </property>
+        <property name="value">
+         <number>50</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
   </layout>
@@ -411,13 +408,11 @@
   <tabstop>x2_dim</tabstop>
   <tabstop>x3_dim</tabstop>
   <tabstop>y_dim</tabstop>
-  <tabstop>sample_spin</tabstop>
   <tabstop>line_input</tabstop>
   <tabstop>select_input</tabstop>
   <tabstop>line_output</tabstop>
   <tabstop>select_output</tabstop>
   <tabstop>exec_button</tabstop>
-  <tabstop>plot_button</tabstop>
  </tabstops>
  <resources/>
  <connections>
@@ -429,22 +424,6 @@
    <hints>
     <hint type="sourcelabel">
      <x>379</x>
-     <y>219</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>309</x>
-     <y>199</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>plot_button</sender>
-   <signal>clicked()</signal>
-   <receiver>Form</receiver>
-   <slot>plot_clicked()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>526</x>
      <y>219</y>
     </hint>
     <hint type="destinationlabel">
