@@ -196,7 +196,7 @@ class PolynomialBuilder(object):
         else:
             plt.show()
 
-    def compare_vals(name, real, predicted, reconstructed=None):
+    def compare_vals(self, name, real, predicted, reconstructed=None):
         fig = plt.figure()
         axes = plt.axes()
         r = np.arange(len(real))
