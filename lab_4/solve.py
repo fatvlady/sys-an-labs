@@ -5,7 +5,7 @@ from openpyxl import Workbook
 from tabulate import tabulate as tb
 
 from lab_4.read_data import read_data
-from forecast_arima import forecast
+from lab_4.forecast_arima import forecast
 from lab_4.system_solve import *
 
 

@@ -1,7 +1,7 @@
 from copy import deepcopy
 import numpy as np
 import matplotlib.pyplot as plt
-from forecast_arima import forecast
+from lab_3.forecast_arima import forecast
 from scipy import special
 from openpyxl import Workbook
 from tabulate import tabulate as tb
