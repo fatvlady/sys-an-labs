@@ -7,4 +7,4 @@ def read_data(filename = 'norm.xlsx'):
     dfs = xl_file.parse(xl_file.sheet_names[0])
     dfd = dfs.as_matrix()
     t = dfs.T.columns.values.tolist()
-    return t, dfd
+    return t[1:51], dfd[1:51]
