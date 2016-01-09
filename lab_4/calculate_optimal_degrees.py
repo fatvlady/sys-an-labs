@@ -14,7 +14,7 @@ def brute(args):
     obj.built_c()
     obj.built_F()
     obj.built_F_()
-    print i,j,k
+    print(i,j,k)
     return (i, j, k), np.linalg.norm(obj.norm_error, np.inf), obj.norm_error
 
 def determine_deg(a, p1, p2, p3):

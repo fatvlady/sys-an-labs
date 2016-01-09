@@ -104,9 +104,11 @@ def calc_a(endog, order):
     return x
 
 
-def arma(endog, forecast):
+def ar(endog, forecast):
     n = len(endog)
     endog = np.array(endog)
+    if st.variance(endog) ==0:
+        return st.mean(endog)*np.ones(forecast)
     pacf_endog = pacf(endog)
     print(pacf_endog)
     order = np.where(abs(pacf_endog)>PCF)[0][-1]+1

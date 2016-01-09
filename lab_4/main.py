@@ -172,7 +172,8 @@ class MainWindow(QDialog, form_class):
         return dict(custom_struct=self.custom_func_struct,poly_type=self.type, degrees=self.degrees,
                     dimensions=self.dimensions,
                     samples=self.samples_num, output_file=self.output_path,
-                    weights=self.weight_method, lambda_multiblock=self.lambda_multiblock)
+                    weights=self.weight_method, lambda_multiblock=self.lambda_multiblock,
+                    pred_steps = self.predictBox.value())
 
 
 # -----------------------------------------------------#

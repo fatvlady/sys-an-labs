@@ -3,8 +3,9 @@ from copy import deepcopy
 from scipy import special
 from openpyxl import Workbook
 
-from forecast_arima import forecast
 from lab_4.system_solve import *
+from lab_4.forecast_ar import ar as forecast
+
 
 
 class Solve(object):
@@ -23,6 +24,7 @@ class Solve(object):
         self.norm_error = 0.0
         self.eps = 1E-8
         self.error = 0.0
+        self.pred_step = d['pred_steps']
 
     def load_data(self, data):
         self.datas = data
@@ -369,20 +371,6 @@ class Solve(object):
 
         wb.save(self.filename_output)
 
-    def prepare(self):
-        self.norm_data()
-        self.define_norm_vectors()
-        self.built_B()
-        self.poly_func()
-        self.built_A()
-        self.lamb()
-        self.psi()
-        self.built_a()
-        self.built_Fi()
-        self.built_c()
-        self.built_F()
-        self.built_F_()
-        self.save_to_file()
 
     def aggregate(self, values, coeffs):
         return np.exp(np.dot(np.log(1 + values + self.OFFSET), coeffs)) - 1
@@ -393,6 +381,9 @@ class Solve(object):
 
         X = np.array(X)
         X = (X - self.minX) / (self.maxX - self.minX)
+        for i in range(len(X)):
+            if np.isnan(X[i]):
+                X[i] = 1
         X = np.split(X, self.dim_integral[:2])
         phi = np.array([calculate_polynomials(vector, self.deg[i]) for i, vector in enumerate(X)])
         psi = list()
@@ -412,22 +403,38 @@ class Solve(object):
         result = result * (self.maxY - self.minY) + self.minY
         return result
 
-    def build_predicted(self, steps):
+    def build_predicted(self):
         XF = list()
         for i, x in enumerate(self.X_):
             xf = list()
             for j, xc in enumerate(x.T):
-                xf.append(forecast(xc.getA1(), steps))
+                xf.append(forecast(xc.getA1(), self.pred_step))
             XF.append(xf)
         yf = list()
-        for s in range(1, steps + 1):
+        for s in range(1, self.pred_step + 1):
             x = list()
             for xf in XF:
                 for xfc in xf:
                     x.append(xfc[-s])
             yf.append(self.calculate_value(x))
-        YF = self.Y_.copy().getA()
-        YF[-steps:] = np.array(yf)
-        return XF, YF
+        self.XF = XF
+        self.YF = np.array(yf)
+
+
+    def prepare(self):
+        self.norm_data()
+        self.define_norm_vectors()
+        self.built_B()
+        self.poly_func()
+        self.built_A()
+        self.lamb()
+        self.psi()
+        self.built_a()
+        self.built_Fi()
+        self.built_c()
+        self.built_F()
+        self.built_F_()
+        self.save_to_file()
+        self.build_predicted()
 
 
