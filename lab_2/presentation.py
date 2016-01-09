@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from os import name as os_name
 
 from lab_2.solve import Solve
 import lab_2.basis_generator as b_gen
@@ -202,4 +203,7 @@ class PolynomialBuilder(object):
 
         manager = plt.get_current_fig_manager()
         manager.set_window_title('Graph')
-        fig.show()
+        if os_name == 'posix':
+            fig.show()
+        else:
+            plt.show()

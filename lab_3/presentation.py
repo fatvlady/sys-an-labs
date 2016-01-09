@@ -1,10 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from numpy.polynomial import Polynomial as pnm
+from os import name as os_name
 
 from lab_3.solve import Solve
 import lab_3.basis_generator as b_gen
-from lab_3.forecast_arima import forecast
 
 __author__ = 'vlad'
 
@@ -191,8 +191,12 @@ class PolynomialBuilder(object):
 
         manager = plt.get_current_fig_manager()
         manager.set_window_title('Graph')
+        if os_name == 'posix':
+            fig.show()
+        else:
+            plt.show()
 
-    def compare_vals(name, real, predicted, reconstructed=None):
+    def compare_vals(self, name, real, predicted, reconstructed=None):
         fig = plt.figure()
         axes = plt.axes()
         r = np.arange(len(real))
@@ -204,7 +208,10 @@ class PolynomialBuilder(object):
             axes.plot(r, reconstructed, label='reconstructed')
         axes.plot(r, real, label='real')
         axes.legend(loc='upper right', fontsize=16)
-        fig.show()
+        if os_name == 'posix':
+            fig.show()
+        else:
+            plt.show()
 
     def plot_graphs_with_prediction(self, steps):
         XF, YF = self._solution.build_predicted(steps)

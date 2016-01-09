@@ -448,7 +448,7 @@ class Solve(object):
         X = np.array(X)
         X = (X - self.minX) / (self.maxX - self.minX)
         X = np.split(X, self.dim_integral[:2])
-        phi = np.array([calculate_polynomials(vector, self.deg[i]) for i, vector in enumerate(X)])
+        phi = [calculate_polynomials(vector, self.deg[i]) for i, vector in enumerate(X)]
         psi = list()
         shift = 0
         for i in range(3):

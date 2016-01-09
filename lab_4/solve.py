@@ -2,10 +2,8 @@ from copy import deepcopy
 
 from scipy import special
 from openpyxl import Workbook
-from tabulate import tabulate as tb
 
-from lab_4.read_data import read_data
-from lab_4.forecast_arima import forecast
+from forecast_arima import forecast
 from lab_4.system_solve import *
 
 
@@ -13,11 +11,10 @@ class Solve(object):
     OFFSET = 1e-10
 
     def __init__(self, d):
-        self.n02 = d['samples']
-        if self.n02 >70 and self.n02<40:
+        self.n = d['samples']
+        if self.n >70 and self.n<40:
             raise Exception('Samples n02 not in range(40,70)')
         self.dim = d['dimensions']
-        self.filename_input = d['input_file']
         self.filename_output = d['output_file']
         self.deg = list(map(lambda x: x + 1, d['degrees']))  # on 1 more because include 0
         self.weights = d['weights']
@@ -27,10 +24,9 @@ class Solve(object):
         self.eps = 1E-8
         self.error = 0.0
 
-    def define_data(self):
-        self.t, self.datas = read_data(self.filename_input)
-        self.datas = np.matrix(self.datas)
-        self.n = len(self.t)
+    def load_data(self, data):
+        self.datas = data
+        self.datas = np.asmatrix(self.datas)
         # list of sum degrees [ 3,1,2] -> [3,4,6]
         self.dim_integral = [sum(self.dim[:i + 1]) for i in range(len(self.dim))]
 
@@ -60,8 +56,12 @@ class Solve(object):
         for j in range(m):
             minv = np.min(self.datas[:, j])
             maxv = np.max(self.datas[:, j])
-            for i in range(n):
-                vec[i, j] = (self.datas[i, j] - minv) / (maxv - minv)
+            if minv == maxv:
+                for i in range(n):
+                    vec[i, j] = 1
+            else:
+                for i in range(n):
+                    vec[i, j] = (self.datas[i, j] - minv) / (maxv - minv)
         self.data = np.matrix(vec)
 
     def define_norm_vectors(self):
@@ -369,61 +369,7 @@ class Solve(object):
 
         wb.save(self.filename_output)
 
-    def show(self):
-        text = []
-        text.append('\nError normalised (Y - F)')
-        text.append(tb([self.norm_error]))
-
-        text.append('\nError (Y_ - F_))')
-        text.append(tb([self.error]))
-
-        text.append('Input data: X')
-        text.append(tb(np.array(self.datas[:, :self.dim_integral[2]])))
-
-        text.append('\nInput data: Y')
-        text.append(tb(np.array(self.datas[:, self.dim_integral[2]:self.dim_integral[3]])))
-
-        text.append('\nX normalised:')
-        text.append(tb(np.array(self.data[:, :self.dim_integral[2]])))
-
-        text.append('\nY normalised:')
-        text.append(tb(np.array(self.data[:, self.dim_integral[2]:self.dim_integral[3]])))
-
-        text.append('\nmatrix B:')
-        text.append(tb(np.array(self.B)))
-
-        # text.append('\nmatrix A:')
-        # text.append(tb(np.array(self.A)))
-
-        text.append('\nmatrix Lambda:')
-        text.append(tb(np.array(self.Lamb)))
-
-        for j in range(len(self.Psi)):
-            s = '\nmatrix Psi%i:' % (j + 1)
-            text.append(s)
-            text.append(tb(np.array(self.Psi[j])))
-
-        text.append('\nmatrix a:')
-        text.append(tb(self.a.tolist()))
-
-        for j in range(len(self.Fi)):
-            s = '\nmatrix F%i:' % (j + 1)
-            text.append(s)
-            text.append(tb(np.array(self.Fi[j])))
-
-        text.append('\nmatrix c:')
-        text.append(tb(np.array(self.c)))
-
-        text.append('\nY rebuilt normalized :')
-        text.append(tb(np.array(self.F)))
-
-        text.append('\nY rebuilt :')
-        text.append(tb(self.F_.tolist()))
-
-        return '\n'.join(text)
-
     def prepare(self):
-        self.define_data()
         self.norm_data()
         self.define_norm_vectors()
         self.built_B()
@@ -436,7 +382,6 @@ class Solve(object):
         self.built_c()
         self.built_F()
         self.built_F_()
-        self.show()
         self.save_to_file()
 
     def aggregate(self, values, coeffs):
