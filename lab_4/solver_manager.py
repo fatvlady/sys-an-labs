@@ -8,8 +8,9 @@ from lab_4.presentation import PolynomialBuilderExpTh, PolynomialBuilder
 
 
 def prob(x, xmax, xmin):
-    return np.fabs((x - xmax) / (xmax - xmin))
-
+    res = np.fabs((x - xmax) / (xmax - xmin))
+    r = np.ma.array(res, mask = np.array(x>=xmax), fill_value= 0)
+    return r.filled()
 
 def classify_danger_rating(level):
     if 0 <= level <= 0.125:
@@ -31,8 +32,8 @@ def classify_danger_rating(level):
 
 
 class SolverManager(object):
-    Y_C = np.array([9400.0, 20000, 2e+007])  # contingency value
-    Y_D = np.array([9350.0, 10000, 1e+007])  # danger value
+    Y_C = np.array([950, 12100, 5000000])  # contingency value
+    Y_D = np.array([0.0, 0, 0])  # danger value
 
     def __init__(self, d):
         self.custom_struct = d['custom_struct']
@@ -56,6 +57,7 @@ class SolverManager(object):
         self.p = prob(self.solver.YF, self.Y_C, self.Y_D)
         self.f = 1 - (1 - self.p[:, 0]) * (1 - self.p[:, 1]) * (1 - self.p[:, 2])
         self.danger_rate = [classify_danger_rating(i) for i in self.f]
+        print(self.f)
 
     def plot(self, steps):
         if steps > 0:

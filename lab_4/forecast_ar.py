@@ -110,10 +110,10 @@ def ar(endog, forecast):
     if st.variance(endog) ==0:
         return st.mean(endog)*np.ones(forecast)
     pacf_endog = pacf(endog)
-    print(pacf_endog)
+    #print(pacf_endog)
     order = np.where(abs(pacf_endog)>PCF)[0][-1]+1
     a = calc_a(endog, order)
-    print(a)
+    #print(a)
     for i in range(forecast):
         endog = np.append(endog, np.dot(a[1:],endog[:-order-1:-1])+a[0])
 
