@@ -5,7 +5,7 @@ import sys
 
 from PyQt5.QtCore import pyqtSlot, pyqtSignal
 from PyQt5.QtGui import QTextDocument, QFont
-from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog, QMessageBox
+from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog, QMessageBox, QTableWidgetItem
 from PyQt5.uic import loadUiType
 
 from lab_4.solver_manager import SolverManager
@@ -141,6 +141,11 @@ class MainWindow(QDialog, form_class):
             self.manager = SolverManager(self._get_params())
             self.manager.prepare(self.input_path)
             self.manager.fit(1, self.samples_num)
+            # s = [1,2,3,4]
+            # for i in range(4):
+            #     for m, item in enumerate(s):
+            #         ni = QTableWidgetItem(str(item))
+            #         self.tableWidget.setItem(i, m, ni)
         except Exception as e:
             QMessageBox.warning(self,'Error!','Error happened during execution: ' + str(e))
         self.exec_button.setEnabled(True)
