@@ -1,5 +1,4 @@
 import numpy as np
-import statistics as st
 
 #from statsmodels.tsa.stattools import pacf
 #import matplotlib.pyplot as plt
@@ -60,7 +59,7 @@ LEN_PCF = 10
 def acf(y):
     y = np.array(y)
     m = np.mean(y)
-    var = st.variance(y)
+    var = np.var(y, ddof = 1)
     r = []
     n = len(y)
     for s in range(n-1):
@@ -107,8 +106,8 @@ def calc_a(endog, order):
 def ar(endog, forecast):
     n = len(endog)
     endog = np.array(endog)
-    if st.variance(endog) ==0:
-        return st.mean(endog)*np.ones(forecast)
+    if np.var(endog, ddof = 1) ==0:
+        return np.mean(endog)*np.ones(forecast)
     pacf_endog = pacf(endog)
     #print(pacf_endog)
     order = np.where(abs(pacf_endog)>PCF)[0][-1]+1
