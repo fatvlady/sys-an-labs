@@ -53,8 +53,8 @@ class SolverManager(object):
         self.data_window = self.data[shift:shift + n]
         self.solver.load_data(self.data_window[:, :-2]) #y2 and y3 not used
         self.solver.prepare()
-        x_forecast = self.predict(n)
-        print(self.resolve_value(x_forecast[0]))
+        y_forecast = self.predict(n)
+        #print(self.resolve_value(x_forecast[0]))
         print(self.data_window[-1, -3:])
         # self.risk() # really suspicious realisation
         self.presenter = PolynomialBuilderExpTh(self.solver) if self.custom_struct else PolynomialBuilder(self.solver)
