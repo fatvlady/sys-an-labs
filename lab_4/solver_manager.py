@@ -54,11 +54,11 @@ class SolverManager(object):
 
     def fit(self, shift, n):
         self.data_window = self.data[shift:shift + n]
-        self.solver.load_data(self.data_window[:, :-2])
+        self.solver.load_data(self.data_window[:, :-2]) #y2 and y3 not used
         self.solver.prepare()
         x_forecast = self.predict(n)
-        print self.resolve_value(x_forecast[0])
-        print self.data_window[-1, -3:]
+        print(self.resolve_value(x_forecast[0]))
+        print(self.data_window[-1, -3:])
         # self.risk() # really suspicious realisation
         self.presenter = PolynomialBuilderExpTh(self.solver) if self.custom_struct else PolynomialBuilder(self.solver)
 
@@ -74,9 +74,13 @@ class SolverManager(object):
         else:
             self.presenter.plot_graphs()
 
-    def predict(self, steps):
-        prediction = [self.data_window[-1, :-3]] * steps
-        return prediction
+    def predict(self, x, steps):
+        # x forecasted = self.solver.XF as list(list(array))
+        #y forecasted ---list(arrays)
+        y2_f = forecast(self.data_window[:,3], steps)# array
+        y3_f = forecast(self.data_window[:, 9], steps)#array
+        y_f = [self.solver.YF, y2_f, y3_f]
+        return y_f
 
     def resolve_value(self, x):
         assert len(x) == 18

@@ -416,9 +416,9 @@ class Solve(object):
             for xf in XF:
                 for xfc in xf:
                     x.append(xfc[-s])
-            yf.append(self.calculate_value(x))
+            yf.append(self.calculate_value(x)) #y depend on all x
         self.XF = XF
-        self.YF = np.array(yf)
+        self.YF = np.array(yf).flatten() #flatten because one y
 
 
     def prepare(self):
