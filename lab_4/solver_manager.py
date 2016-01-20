@@ -52,7 +52,6 @@ class SolverManager(object):
         self.N_all_iter = len(self.time)
         self.operator_view.show()
 
-
     def fit(self, shift, n):
         self.data_window = self.data[shift:shift + n]
         self.solver.load_data(self.data_window[:, :-2])
