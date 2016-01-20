@@ -5,6 +5,7 @@ from lab_4.solve import *
 from lab_4.solve_custom import SolveExpTh
 from lab_4.read_data import read_data
 from lab_4.presentation import PolynomialBuilderExpTh, PolynomialBuilder
+from lab_4.operator_view import OperatorViewWindow
 
 
 def prob(x, xmax, xmin):
@@ -43,11 +44,14 @@ class SolverManager(object):
         else:
             self.solver = Solve(d)
         self.data_window = None
+        self.operator_view = OperatorViewWindow()
         self.current_iter = 1 # for what??
 
     def prepare(self, filename):
         self.time, self.data = read_data(filename)
         self.N_all_iter = len(self.time)
+        self.operator_view.show()
+
 
     def fit(self, shift, n):
         self.data_window = self.data[shift:shift + n]
