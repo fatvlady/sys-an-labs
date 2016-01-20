@@ -5,6 +5,7 @@ from lab_4.solve import *
 from lab_4.solve_custom import SolveExpTh
 from lab_4.read_data import read_data
 from lab_4.presentation import PolynomialBuilderExpTh, PolynomialBuilder
+from lab_4.operator_view import OperatorViewWindow
 
 
 def prob(x, xmax, xmin):
@@ -43,19 +44,19 @@ class SolverManager(object):
         else:
             self.solver = Solve(d)
         self.data_window = None
+        self.operator_view = OperatorViewWindow()
         self.current_iter = 1 # for what??
 
     def prepare(self, filename):
         self.time, self.data = read_data(filename)
         self.N_all_iter = len(self.time)
+        self.operator_view.show()
 
     def fit(self, shift, n):
         self.data_window = self.data[shift:shift + n]
         self.solver.load_data(self.data_window[:, :-2]) #y2 and y3 not used
         self.solver.prepare()
-        y_forecast = self.predict(n)
-        #print(self.resolve_value(x_forecast[0]))
-        print(self.data_window[-1, -3:])
+        y_forecast = self.predict()
         # self.risk() # really suspicious realisation
         self.presenter = PolynomialBuilderExpTh(self.solver) if self.custom_struct else PolynomialBuilder(self.solver)
 
@@ -71,17 +72,7 @@ class SolverManager(object):
         else:
             self.presenter.plot_graphs()
 
-    def predict(self, steps):
-        # x forecasted = self.solver.XF as list(list(array))
-        #y forecasted ---list(arrays)
-        y2_f = forecast(self.data_window[:,3], steps)# array
-        y3_f = forecast(self.data_window[:, 9], steps)#array
-        y_f = [self.solver.YF, y2_f, y3_f]
+    def predict(self):
+        y_f = [self.solver.YF, self.solver.XF[0][3], self.solver.XF[1][2]]
         return y_f
 
-    def resolve_value(self, x):
-        assert len(x) == 18
-        y1 = self.solver.calculate_value(x)[0]
-        y2 = x[3]  # x14
-        y3 = x[9]  # x23
-        return y1, y2, y3
