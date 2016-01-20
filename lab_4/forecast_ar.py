@@ -110,7 +110,10 @@ def ar(endog, forecast):
         return np.mean(endog)*np.ones(forecast)
     pacf_endog = pacf(endog)
     #print(pacf_endog)
-    order = np.where(abs(pacf_endog)>PCF)[0][-1]+1
+    try:
+        order = np.where(abs(pacf_endog)>PCF)[0][-1]+1
+    except:
+        order = 1
     a = calc_a(endog, order)
     #print(a)
     for i in range(forecast):
