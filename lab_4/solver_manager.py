@@ -9,7 +9,7 @@ from lab_4.presentation import PolynomialBuilderExpTh, PolynomialBuilder
 
 def prob(x, xmax, xmin):
     res = np.fabs((x - xmax) / (xmax - xmin))
-    r = np.ma.array(res, mask = np.array(x>=xmax), fill_value= 0)
+    r = np.ma.array(res, mask = np.array(x >= xmax), fill_value= 0)
     return r.filled()
 
 def classify_danger_rating(level):
@@ -32,25 +32,31 @@ def classify_danger_rating(level):
 
 
 class SolverManager(object):
-    Y_C = np.array([950, 12100, 5000000])  # contingency value
-    Y_D = np.array([0.0, 0, 0])  # danger value
+    Y_C = np.array([950, 12100, 5000000])  # warning value
+    Y_D = np.array([0.0, 0, 0])  # failure value
 
     def __init__(self, d):
         self.custom_struct = d['custom_struct']
+        d['dimensions'][3] = 1
         if d['custom_struct']:
             self.solver = SolveExpTh(d)
         else:
             self.solver = Solve(d)
-        self.current_iter = 1
+        self.data_window = None
+        self.current_iter = 1 # for what??
 
     def prepare(self, filename):
         self.time, self.data = read_data(filename)
         self.N_all_iter = len(self.time)
 
     def fit(self, shift, n):
-        self.solver.load_data(self.data[shift:shift + n])
+        self.data_window = self.data[shift:shift + n]
+        self.solver.load_data(self.data_window[:, :-2])
         self.solver.prepare()
-        self.risk()
+        x_forecast = self.predict(n)
+        print self.resolve_value(x_forecast[0])
+        print self.data_window[-1, -3:]
+        # self.risk() # really suspicious realisation
         self.presenter = PolynomialBuilderExpTh(self.solver) if self.custom_struct else PolynomialBuilder(self.solver)
 
     def risk(self):
@@ -66,4 +72,12 @@ class SolverManager(object):
             self.presenter.plot_graphs()
 
     def predict(self, steps):
-        pass
+        prediction = [self.data_window[-1, :-3]] * steps
+        return prediction
+
+    def resolve_value(self, x):
+        assert len(x) == 18
+        y1 = self.solver.calculate_value(x)[0]
+        y2 = x[3]  # x14
+        y3 = x[9]  # x23
+        return y1, y2, y3
