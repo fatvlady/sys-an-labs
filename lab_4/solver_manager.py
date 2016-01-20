@@ -74,7 +74,7 @@ class SolverManager(object):
         else:
             self.presenter.plot_graphs()
 
-    def predict(self, x, steps):
+    def predict(self, steps):
         # x forecasted = self.solver.XF as list(list(array))
         #y forecasted ---list(arrays)
         y2_f = forecast(self.data_window[:,3], steps)# array
