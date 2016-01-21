@@ -1,14 +1,16 @@
 # -*- encoding: utf-8 -*-
 
-
 from lab_4.solve import *
 from lab_4.solve_custom import SolveExpTh
 from lab_4.read_data import read_data
 from lab_4.operator_view import OperatorViewWindow
 
 from PyQt5.QtCore import pyqtSlot, pyqtSignal, Qt
+from PyQt5.QtGui import QTextDocument, QFont
 from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog, QMessageBox, QTableWidgetItem
+from PyQt5.uic import loadUiType
 
+import os
 
 
 
@@ -24,6 +26,8 @@ def insert_data(tw, row, data):
                 item = QTableWidgetItem(d)
                 item.setTextAlignment(Qt.AlignHCenter)
                 tw.setItem(row,i,item)
+                print('----added row----')
+                tw.viewport().update()
         except Exception as e:
             raise('insert data in tabel'+str(e))
 
@@ -65,13 +69,17 @@ class SolverManager(object):
                                                               u'Запасенная\ в\ АБ\ энергия,\ Дж'])
         self.current_iter = 1
         self.tablewidget = d['tablewidget']
+        data = np.array(['816.0','950.0','131557.02445038198','41779234.62720786',
+ 'Нештатна ситуація по одному параметру' ,'0.16441530745584276',
+ 'Низький рівень заряду батареї' ,'1'])
+        insert_data(self.tablewidget, 5, data)
 
     def prepare(self, filename):
         self.time, self.data = read_data(filename)
         increment = self.time[-1] - self.time[-2]
-        self.time = np.append(self.time, np.arange(1, 1 + self.forecast_size) * increment + self.time[-1])
+        #self.time = np.append(self.time, np.arange(1, 1 + self.forecast_size) * increment + self.time[-1])
         self.N_all_iter = len(self.time)
-        self.operator_view.show()
+        #self.operator_view.show()
 
     def start_machine(self):
         self.operator_view.start_process()
@@ -125,9 +133,15 @@ class SolverManager(object):
         risk = self.f
         reason = ['Низький рівень заряду батареї']*self.solver.pred_step
         rate = self.danger_rate[:, 0]
+
         data = np.array([t, y1, y2, y3, state, risk, reason, rate]).T
+        insert_data(self.tablewidget, 1, str(data[0][0]))
+        insert_data(self.tablewidget, 1, data[0])
         assert data.shape == (self.solver.pred_step, 8)
         print(self.current_iter)
         for i ,j in enumerate(data):
+            print(j)
             insert_data(self.tablewidget, i, j)
+        print(self.current_iter)
+        os.system('pause')
         return

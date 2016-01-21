@@ -8,7 +8,7 @@ from PyQt5.QtGui import QTextDocument, QFont
 from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog, QMessageBox, QTableWidgetItem
 from PyQt5.uic import loadUiType
 
-from lab_4.solver_manager import SolverManager
+from lab_4.solver_manager import * #SolverManager
 from lab_4.bruteforce import BruteForceWindow
 
 app = QApplication(sys.argv)
@@ -55,7 +55,7 @@ class MainWindow(QDialog, form_class):
         for index, size in enumerate(column_size):
              self.tablewidget.setColumnWidth(index,size)
         #data = ['9999', '999', '9999,99','1234568', 'Безпечна ситуація']
-        #self.insert_data(data)
+        #insert_data(self.tablewidget, 0, data)
         return
 
     @pyqtSlot()
