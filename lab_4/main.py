@@ -13,7 +13,7 @@ from lab_4.bruteforce import BruteForceWindow
 
 app = QApplication(sys.argv)
 app.setApplicationName('lab4_sa')
-form_class, base_class = loadUiType('lab_4/main_window.ui')
+form_class, base_class = loadUiType('lab_4/data/main_window.ui')
 
 
 class MainWindow(QDialog, form_class):
@@ -54,8 +54,6 @@ class MainWindow(QDialog, form_class):
         column_size = [40, 70, 70, 70,160, 60, 160,80]
         for index, size in enumerate(column_size):
              self.tablewidget.setColumnWidth(index,size)
-        #data = ['9999', '999', '9999,99','1234568', 'Безпечна ситуація']
-        #insert_data(self.tablewidget, 0, data)
         return
 
     @pyqtSlot()

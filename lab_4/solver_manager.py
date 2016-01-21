@@ -26,8 +26,7 @@ def insert_data(tw, row, data):
                 item = QTableWidgetItem(d)
                 item.setTextAlignment(Qt.AlignHCenter)
                 tw.setItem(row,i,item)
-                print('----added row----')
-                tw.viewport().update()
+                #tw.viewport().update()
         except Exception as e:
             raise('insert data in tabel'+str(e))
 
@@ -51,7 +50,7 @@ def classify_danger_rating(level):
 
 
 class SolverManager(object):
-    Y_C = np.array([[950], [121000], [50000000]])  # warning value
+    Y_C = np.array([[950], [121000], [5000000]])  # warning value
     Y_D = np.array([[0.0], [0.0], [0.0]])  # failure value
 
     def __init__(self, d):
@@ -69,17 +68,13 @@ class SolverManager(object):
                                                               u'Запасенная\ в\ АБ\ энергия,\ Дж'])
         self.current_iter = 1
         self.tablewidget = d['tablewidget']
-        data = np.array(['816.0','950.0','131557.02445038198','41779234.62720786',
- 'Нештатна ситуація по одному параметру' ,'0.16441530745584276',
- 'Низький рівень заряду батареї' ,'1'])
-        insert_data(self.tablewidget, 5, data)
 
     def prepare(self, filename):
         self.time, self.data = read_data(filename)
         increment = self.time[-1] - self.time[-2]
-        #self.time = np.append(self.time, np.arange(1, 1 + self.forecast_size) * increment + self.time[-1])
+        self.time = np.append(self.time, np.arange(1, 1 + self.forecast_size) * increment + self.time[-1])
         self.N_all_iter = len(self.time)
-        #self.operator_view.show()
+        self.operator_view.show()
 
     def start_machine(self):
         self.operator_view.start_process()
@@ -107,7 +102,6 @@ class SolverManager(object):
                                                self.time[shift + n - 1:shift + n + self.solver.pred_step])
         self.risk()  # really suspicious realisation
         self.table_data_forecasted()
-        self.presenter = PolynomialBuilderExpTh(self.solver) if self.custom_struct else PolynomialBuilder(self.solver)
 
     def risk(self):
         self.p = prob(self.y_forecasted, self.Y_C, self.Y_D)
@@ -127,15 +121,8 @@ class SolverManager(object):
         risk = self.f
         reason = ['Низький рівень заряду батареї']*self.solver.pred_step
         rate = self.danger_rate[:, 0]
-
         data = np.array([t, y1, y2, y3, state, risk, reason, rate]).T
-        insert_data(self.tablewidget, 1, str(data[0][0]))
-        insert_data(self.tablewidget, 1, data[0])
         assert data.shape == (self.solver.pred_step, 8)
-        print(self.current_iter)
         for i ,j in enumerate(data):
-            print(j)
             insert_data(self.tablewidget, i, j)
-        print(self.current_iter)
-        os.system('pause')
         return
