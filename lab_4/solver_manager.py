@@ -107,7 +107,6 @@ class SolverManager(object):
                                                self.time[shift + n - 1:shift + n + self.solver.pred_step])
         self.risk()  # really suspicious realisation
         self.table_data_forecasted()
-        self.presenter = PolynomialBuilderExpTh(self.solver) if self.custom_struct else PolynomialBuilder(self.solver)
 
     def risk(self):
         self.p = prob(self.y_forecasted, self.Y_C, self.Y_D)
@@ -137,5 +136,4 @@ class SolverManager(object):
             print(j)
             insert_data(self.tablewidget, i, j)
         print(self.current_iter)
-        os.system('pause')
         return

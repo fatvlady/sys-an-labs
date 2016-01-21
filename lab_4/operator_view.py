@@ -105,10 +105,9 @@ class OperatorViewWindow(QDialog):
 
     @pyqtSlot()
     def start_process(self):
-        # self.timer = QTimer(self)
-        # self.timer.timeout.connect(self.execute_iteration)
-        # self.timer.start(5)
-        self.execute_iteration()
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.execute_iteration)
+        self.timer.start(5)
 
     @pyqtSlot()
     def execute_iteration(self):
