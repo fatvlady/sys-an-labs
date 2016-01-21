@@ -383,12 +383,18 @@
     </widget>
    </item>
    <item row="2" column="0" colspan="3">
-    <widget class="QTableWidget" name="tableWidget">
+    <widget class="QTableWidget" name="tablewidget">
+     <property name="maximumSize">
+      <size>
+       <width>740</width>
+       <height>16777215</height>
+      </size>
+     </property>
      <property name="rowCount">
       <number>10</number>
      </property>
      <property name="columnCount">
-      <number>5</number>
+      <number>8</number>
      </property>
      <row/>
      <row/>
@@ -402,29 +408,111 @@
      <row/>
      <column>
       <property name="text">
-       <string>a</string>
+       <string>№
+виб</string>
+      </property>
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>b</string>
+       <string>Прибуток</string>
+      </property>
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>c</string>
+       <string>Запас
+ходу</string>
+      </property>
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>d</string>
+       <string>Енергія
+АБ</string>
+      </property>
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>e</string>
+       <string>Стан
+фунціонування</string>
+      </property>
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
       </property>
      </column>
+     <column>
+      <property name="text">
+       <string>Ризик
+аварії</string>
+      </property>
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Причина
+нештатної
+ситуації</string>
+      </property>
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Рівень
+небезпеки</string>
+      </property>
+      <property name="font">
+       <font>
+        <weight>75</weight>
+        <bold>true</bold>
+       </font>
+      </property>
+     </column>
+     <item row="0" column="0">
+      <property name="text">
+       <string/>
+      </property>
+      <property name="font">
+       <font>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+     </item>
     </widget>
    </item>
   </layout>

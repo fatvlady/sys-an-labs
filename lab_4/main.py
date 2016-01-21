@@ -3,7 +3,7 @@ __author__ = 'vlad'
 
 import sys
 
-from PyQt5.QtCore import pyqtSlot, pyqtSignal
+from PyQt5.QtCore import pyqtSlot, pyqtSignal, Qt
 from PyQt5.QtGui import QTextDocument, QFont
 from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog, QMessageBox, QTableWidgetItem
 from PyQt5.uic import loadUiType
@@ -46,6 +46,15 @@ class MainWindow(QDialog, form_class):
         self.lambda_multiblock = self.lambda_check.isChecked()
         self.weight_method = self.weights_box.currentText().lower()
         self.manager = None
+
+
+        #set tablewidget
+        self.tablewidget.verticalHeader().hide()
+        column_size = [40, 70, 70, 70,160, 60, 160,80]
+        for index, size in enumerate(column_size):
+             self.tablewidget.setColumnWidth(index,size)
+        data = ['9999', '999', '9999,99','1234568', 'Безпечна ситуація']
+        self.insert_data(data)
         return
 
     @pyqtSlot()
@@ -180,6 +189,12 @@ class MainWindow(QDialog, form_class):
                     weights=self.weight_method, lambda_multiblock=self.lambda_multiblock,
                     pred_steps = self.predictBox.value())
 
+    def insert_data(self, data):
+        assert len(data) <= 8
+        for i,d in enumerate(data):
+            item = QTableWidgetItem(d)
+            item.setTextAlignment(Qt.AlignHCenter)
+            self.tablewidget.setItem(0,i,item)
 
 # -----------------------------------------------------#
 form = MainWindow()
