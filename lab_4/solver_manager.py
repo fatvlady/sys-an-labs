@@ -76,3 +76,5 @@ class SolverManager(object):
         y_f = [self.solver.YF, self.solver.XF[0][3], self.solver.XF[1][2]]
         return y_f
 
+    def table_data(self):
+        return
