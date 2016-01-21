@@ -4,7 +4,6 @@
 from lab_4.solve import *
 from lab_4.solve_custom import SolveExpTh
 from lab_4.read_data import read_data
-from lab_4.presentation import PolynomialBuilderExpTh, PolynomialBuilder
 from lab_4.operator_view import OperatorViewWindow
 
 
@@ -45,6 +44,7 @@ class SolverManager(object):
             self.solver = Solve(d)
         self.first_launch = True
         self.batch_size = d['samples']
+        self.forecast_size = d['pred_steps']
         self.operator_view = OperatorViewWindow(warn=self.Y_C, fail=self.Y_D, callback=self,
                                                 descriptions=[u'прибыль\ от\ перевозки,\ грн', u'запас\ хода,\ м',
                                                               u'Запасенная\ в\ АБ\ энергия,\ Дж'])
@@ -52,15 +52,20 @@ class SolverManager(object):
 
     def prepare(self, filename):
         self.time, self.data = read_data(filename)
+        increment = self.time[-1] - self.time[-2]
+        self.time = np.append(self.time, np.arange(1, 1 + self.forecast_size) * increment + self.time[-1])
         self.N_all_iter = len(self.time)
         self.operator_view.show()
 
     def start_machine(self):
-        self.operator_view.start()
+        self.operator_view.start_process()
 
     def launch(self):
-        self.fit(self.current_iter, self.batch_size)
-        self.current_iter += 1
+        if self.current_iter + self.batch_size < len(self.data):
+            self.fit(self.current_iter, self.batch_size)
+            self.current_iter += 1
+        else:
+            self.operator_view.timer.stop()
 
     def fit(self, shift, n):
         data_window = self.data[shift:shift + n]
@@ -70,13 +75,12 @@ class SolverManager(object):
         if self.first_launch:
             self.operator_view.initial_graphics_fill(real_values=data_window[:, -3:], predicted_values=y_forecast,
                                                      risk_values=y_forecast,
-                                                     time_ticks=self.time[shift:shift + n + self.solver.pred_step])
+                                                     time_ticks=self.time[shift:shift + n + self.forecast_size])
             self.first_launch = False
         else:
             self.operator_view.update_graphics(data_window[-1, -3:], y_forecast, y_forecast,
-                                               self.time[shift + n - 1:shift + n + self.solver.pred_step])
+                                               self.time[shift + n - 1:shift + n + self.forecast_size])
         # self.risk() # really suspicious realisation
-        self.presenter = PolynomialBuilderExpTh(self.solver) if self.custom_struct else PolynomialBuilder(self.solver)
 
     def risk(self):
         self.p = prob(self.solver.YF, self.Y_C, self.Y_D)

@@ -149,7 +149,7 @@ class MainWindow(QDialog, form_class):
         try:
             self.manager = SolverManager(self._get_params())
             self.manager.prepare(self.input_path)
-            self.manager.start_machine()
+            # self.manager.start_machine()
             # s = [1,2,3,4]
             # for i in range(4):
             #     for m, item in enumerate(s):
@@ -187,7 +187,7 @@ class MainWindow(QDialog, form_class):
                     dimensions=self.dimensions,
                     samples=self.samples_num, output_file=self.output_path,
                     weights=self.weight_method, lambda_multiblock=self.lambda_multiblock,
-                    pred_steps = self.predictBox.value())
+                    pred_steps=self.predictBox.value())
 
     def insert_data(self, data):
         assert len(data) <= 8
