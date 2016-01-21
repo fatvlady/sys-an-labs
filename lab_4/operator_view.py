@@ -25,7 +25,7 @@ class DynamicRiskCanvas(FigureCanvas):
         self.time_separator = None
         fig = Figure(dpi=dpi)
         self.axes = fig.add_subplot(111)
-        self.axes.set_title('$Y_{}${}'.format(str(self.coordinate), '(' + description + ')' if description
+        self.axes.set_title(u'$Y_{}{}$'.format(str(self.coordinate), u'(' + description + u')' if description
                                               else ''), fontsize=10)
         self.real_line, self.predicted_line, self.risk_line = self.axes.plot([], [], 'black', [], [], 'g', [], [], 'g-')
         FigureCanvas.__init__(self, fig)
@@ -35,20 +35,20 @@ class DynamicRiskCanvas(FigureCanvas):
                                    QtWidgets.QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
 
-
     def compute_initial_figure(self, real_values, predicted_values, risk_values, time_ticks):
         self.real_line.set_data(time_ticks[:-self.tail], real_values)
         self.predicted_line.set_data(time_ticks[-self.tail - 1:], np.append(real_values[-1], predicted_values))
         self.risk_line.set_data(time_ticks[-self.tail - 1:], np.append(real_values[-1], risk_values))
         self.axes.axhline(y=self.warning_threshold, color='r', linestyle='dotted')
         self.axes.axhline(y=self.failure_threshold, color='r', linewidth=3)
+        self.axes.axhspan(ymin=self.failure_threshold, ymax=self.warning_threshold, alpha=0.2, color='r')
         self.time_separator = self.axes.axvline(x=time_ticks[-self.tail - 1], color='b')
-        self.axes.relim()
-        self.axes.autoscale_view()
-        bot, top = self.axes.get_ylim()
-        bot -= (top - bot)*0.05
-        top += (top - bot)*0.05
+        bot = min(map(min,[real_values, predicted_values, risk_values]))
+        top = max(map(max,[real_values, predicted_values, risk_values]))
+        bot -= (top - bot)*0.1
+        top += (top - bot)*0.1
         self.axes.set_ylim(bot, top)
+        self.axes.set_xlim(time_ticks[0], time_ticks[-1])
         self.draw()
 
     def update_figure(self, real_value, predicted_values, risk_values, time_ticks):
@@ -68,8 +68,12 @@ class DynamicRiskCanvas(FigureCanvas):
         # move current time marker
         self.time_separator.set_xdata([time_head[-1]] * 2)
         # redraw with new limits
-        self.axes.relim()
-        self.axes.autoscale_view()
+        bot = min(map(min,[values_head, predicted_values, risk_values]))
+        top = max(map(max,[values_head, predicted_values, risk_values]))
+        bot -= (top - bot)*0.1
+        top += (top - bot)*0.1
+        self.axes.set_ylim(bot, top)
+        self.axes.set_xlim(time_head[0], time_ticks[-1])
         self.draw()
 
 
@@ -81,6 +85,8 @@ class OperatorViewWindow(QDialog):
         failure = kwargs.get('fail', [0,0,0])
         tail = kwargs.get('tail', 10)
         remove_old = kwargs.get('remove_old', True)
+        descriptions = kwargs.get('descriptions', [None] * 3)
+        self.timer = None
         self.ui = form_class()
         self.ui.setupUi(self)
         self.engine = kwargs['callback']
@@ -97,10 +103,11 @@ class OperatorViewWindow(QDialog):
         for i, graph in enumerate(self.graphs):
             graph.update_figure(real_value[i], predicted_values[i], risk_values[i], forecast_ticks)
 
-    def start(self):
-        timer = QTimer(self)
-        timer.timeout.connect(self.execute_iteration)
-        timer.start(500)
+    @pyqtSlot()
+    def start_process(self):
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.execute_iteration)
+        self.timer.start(5)
 
     @pyqtSlot()
     def execute_iteration(self):

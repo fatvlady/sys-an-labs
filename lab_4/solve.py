@@ -381,6 +381,7 @@ class Solve(object):
 
         X = np.array(X)
         X = (X - self.minX) / (self.maxX - self.minX)
+        X = np.ma.array(X, mask=X < 0, fill_value=0).filled()
         for i in range(len(X)):
             if np.isnan(X[i]):
                 X[i] = 1

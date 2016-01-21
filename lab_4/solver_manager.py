@@ -4,20 +4,17 @@
 from lab_4.solve import *
 from lab_4.solve_custom import SolveExpTh
 from lab_4.read_data import read_data
-from lab_4.presentation import PolynomialBuilderExpTh, PolynomialBuilder
 from lab_4.operator_view import OperatorViewWindow
 
 from PyQt5.QtCore import pyqtSlot, pyqtSignal, Qt
-from PyQt5.QtGui import QTextDocument, QFont
 from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog, QMessageBox, QTableWidgetItem
-from PyQt5.uic import loadUiType
 
 
 
 
 def prob(x, xmax, xmin):
     res = np.fabs((x - xmax) / (xmax - xmin))
-    r = np.ma.array(res, mask=np.array(x >= xmax), fill_value=0)
+    r = np.ma.array(res, mask = np.array(x >= xmax), fill_value= 0)
     return r.filled()
 
 def insert_data(tw, row, data):
@@ -62,21 +59,29 @@ class SolverManager(object):
             self.solver = Solve(d)
         self.first_launch = True
         self.batch_size = d['samples']
-        self.operator_view = OperatorViewWindow(warn=self.Y_C, fail=self.Y_D, callback=self)
+        self.forecast_size = d['pred_steps']
+        self.operator_view = OperatorViewWindow(warn=self.Y_C, fail=self.Y_D, callback=self,
+                                                descriptions=[u'прибыль\ от\ перевозки,\ грн', u'запас\ хода,\ м',
+                                                              u'Запасенная\ в\ АБ\ энергия,\ Дж'])
         self.current_iter = 1
         self.tablewidget = d['tablewidget']
 
     def prepare(self, filename):
         self.time, self.data = read_data(filename)
+        increment = self.time[-1] - self.time[-2]
+        self.time = np.append(self.time, np.arange(1, 1 + self.forecast_size) * increment + self.time[-1])
         self.N_all_iter = len(self.time)
-        #self.operator_view.show()
+        self.operator_view.show()
 
     def start_machine(self):
-        self.operator_view.start()
+        self.operator_view.start_process()
 
     def launch(self):
-        self.fit(self.current_iter, self.batch_size)
-        self.current_iter += 1
+        if self.current_iter + self.batch_size < len(self.data):
+            self.fit(self.current_iter, self.batch_size)
+            self.current_iter += 1
+        else:
+            self.operator_view.timer.stop()
 
     def fit(self, shift, n):
         data_window = self.data[shift:shift + n]
