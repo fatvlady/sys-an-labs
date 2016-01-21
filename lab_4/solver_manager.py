@@ -114,12 +114,6 @@ class SolverManager(object):
         self.f = 1 - (1 - self.p[0, :]) * (1 - self.p[1, :]) * (1 - self.p[2, :])
         self.danger_rate = np.array([classify_danger_rating(i) for i in self.f])
 
-    def plot(self, steps):
-        if steps > 0:
-            self.presenter.plot_graphs_with_prediction(steps)
-        else:
-            self.presenter.plot_graphs()
-
     def predict(self):
         self.y_forecasted = [self.solver.YF, self.solver.XF[0][3], self.solver.XF[1][2]]
         return
