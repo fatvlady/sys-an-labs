@@ -7,11 +7,28 @@ from lab_4.read_data import read_data
 from lab_4.presentation import PolynomialBuilderExpTh, PolynomialBuilder
 from lab_4.operator_view import OperatorViewWindow
 
+from PyQt5.QtCore import pyqtSlot, pyqtSignal, Qt
+from PyQt5.QtGui import QTextDocument, QFont
+from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog, QMessageBox, QTableWidgetItem
+from PyQt5.uic import loadUiType
+
+
+
 
 def prob(x, xmax, xmin):
     res = np.fabs((x - xmax) / (xmax - xmin))
-    r = np.ma.array(res, mask = np.array(x >= xmax), fill_value= 0)
+    r = np.ma.array(res, mask=np.array(x >= xmax), fill_value=0)
     return r.filled()
+
+def insert_data(tw, row, data):
+        assert len(data) <= 8
+        try:
+            for i,d in enumerate(data):
+                item = QTableWidgetItem(d)
+                item.setTextAlignment(Qt.AlignHCenter)
+                tw.setItem(row,i,item)
+        except Exception as e:
+            raise('insert data in tabel'+str(e))
 
 def classify_danger_rating(level):
     if 0 <= level <= 0.125:
@@ -33,8 +50,8 @@ def classify_danger_rating(level):
 
 
 class SolverManager(object):
-    Y_C = np.array([950, 12100, 5000000])  # warning value
-    Y_D = np.array([0.0, 0, 0])  # failure value
+    Y_C = np.array([[950], [121000], [50000000]])  # warning value
+    Y_D = np.array([[0.0], [0.0], [0.0]])  # failure value
 
     def __init__(self, d):
         self.custom_struct = d['custom_struct']
@@ -47,11 +64,12 @@ class SolverManager(object):
         self.batch_size = d['samples']
         self.operator_view = OperatorViewWindow(warn=self.Y_C, fail=self.Y_D, callback=self)
         self.current_iter = 1
+        self.tablewidget = d['tablewidget']
 
     def prepare(self, filename):
         self.time, self.data = read_data(filename)
         self.N_all_iter = len(self.time)
-        self.operator_view.show()
+        #self.operator_view.show()
 
     def start_machine(self):
         self.operator_view.start()
@@ -62,25 +80,26 @@ class SolverManager(object):
 
     def fit(self, shift, n):
         data_window = self.data[shift:shift + n]
-        self.solver.load_data(data_window[:, :-2]) #y2 and y3 not used
+        self.solver.load_data(data_window[:, :-2])  # y2 and y3 not used
         self.solver.prepare()
-        y_forecast = self.predict()
+        self.predict()
         if self.first_launch:
-            self.operator_view.initial_graphics_fill(real_values=data_window[:, -3:], predicted_values=y_forecast,
-                                                     risk_values=y_forecast,
+            self.operator_view.initial_graphics_fill(real_values=data_window[:, -3:],
+                                                     predicted_values=self.y_forecasted,
+                                                     risk_values=self.y_forecasted,
                                                      time_ticks=self.time[shift:shift + n + self.solver.pred_step])
             self.first_launch = False
         else:
-            self.operator_view.update_graphics(data_window[-1, -3:], y_forecast, y_forecast,
+            self.operator_view.update_graphics(data_window[-1, -3:], self.y_forecasted, self.y_forecasted,
                                                self.time[shift + n - 1:shift + n + self.solver.pred_step])
-        # self.risk() # really suspicious realisation
+        self.risk()  # really suspicious realisation
+        self.table_data_forecasted()
         self.presenter = PolynomialBuilderExpTh(self.solver) if self.custom_struct else PolynomialBuilder(self.solver)
 
     def risk(self):
-        self.p = prob(self.solver.YF, self.Y_C, self.Y_D)
-        self.f = 1 - (1 - self.p[:, 0]) * (1 - self.p[:, 1]) * (1 - self.p[:, 2])
-        self.danger_rate = [classify_danger_rating(i) for i in self.f]
-        print(self.f)
+        self.p = prob(self.y_forecasted, self.Y_C, self.Y_D)
+        self.f = 1 - (1 - self.p[0, :]) * (1 - self.p[1, :]) * (1 - self.p[2, :])
+        self.danger_rate = np.array([classify_danger_rating(i) for i in self.f])
 
     def plot(self, steps):
         if steps > 0:
@@ -89,8 +108,21 @@ class SolverManager(object):
             self.presenter.plot_graphs()
 
     def predict(self):
-        y_f = [self.solver.YF, self.solver.XF[0][3], self.solver.XF[1][2]]
-        return y_f
+        self.y_forecasted = [self.solver.YF, self.solver.XF[0][3], self.solver.XF[1][2]]
+        return
 
-    def table_data(self):
+    def table_data_forecasted(self):
+        t = self.time[self.batch_size + self.current_iter: self.batch_size + self.current_iter + self.solver.pred_step]
+        y1 = self.y_forecasted[0]
+        y2 = self.y_forecasted[1]
+        y3 = self.y_forecasted[2]
+        state = self.danger_rate[:, 1]
+        risk = self.f
+        reason = ['Низький рівень заряду батареї']*self.solver.pred_step
+        rate = self.danger_rate[:, 0]
+        data = np.array([t, y1, y2, y3, state, risk, reason, rate]).T
+        assert data.shape == (self.solver.pred_step, 8)
+        print(self.current_iter)
+        for i ,j in enumerate(data):
+            insert_data(self.tablewidget, i, j)
         return

@@ -50,11 +50,12 @@ class MainWindow(QDialog, form_class):
 
         #set tablewidget
         self.tablewidget.verticalHeader().hide()
+        self.tablewidget.setRowCount(0)
         column_size = [40, 70, 70, 70,160, 60, 160,80]
         for index, size in enumerate(column_size):
              self.tablewidget.setColumnWidth(index,size)
-        data = ['9999', '999', '9999,99','1234568', 'Безпечна ситуація']
-        self.insert_data(data)
+        #data = ['9999', '999', '9999,99','1234568', 'Безпечна ситуація']
+        #self.insert_data(data)
         return
 
     @pyqtSlot()
@@ -147,14 +148,10 @@ class MainWindow(QDialog, form_class):
     def exec_clicked(self):
         self.exec_button.setEnabled(False)
         try:
+            self.tablewidget.setRowCount(self.predictBox.value())
             self.manager = SolverManager(self._get_params())
             self.manager.prepare(self.input_path)
             self.manager.start_machine()
-            # s = [1,2,3,4]
-            # for i in range(4):
-            #     for m, item in enumerate(s):
-            #         ni = QTableWidgetItem(str(item))
-            #         self.tableWidget.setItem(i, m, ni)
         except Exception as e:
             QMessageBox.warning(self,'Error!','Error happened during execution: ' + str(e))
         self.exec_button.setEnabled(True)
@@ -187,14 +184,8 @@ class MainWindow(QDialog, form_class):
                     dimensions=self.dimensions,
                     samples=self.samples_num, output_file=self.output_path,
                     weights=self.weight_method, lambda_multiblock=self.lambda_multiblock,
-                    pred_steps = self.predictBox.value())
+                    pred_steps = self.predictBox.value(), tablewidget = self.tablewidget)
 
-    def insert_data(self, data):
-        assert len(data) <= 8
-        for i,d in enumerate(data):
-            item = QTableWidgetItem(d)
-            item.setTextAlignment(Qt.AlignHCenter)
-            self.tablewidget.setItem(0,i,item)
 
 # -----------------------------------------------------#
 form = MainWindow()

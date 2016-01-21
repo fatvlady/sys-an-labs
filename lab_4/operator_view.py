@@ -85,7 +85,7 @@ class OperatorViewWindow(QDialog):
         self.ui.setupUi(self)
         self.engine = kwargs['callback']
         self.graphs = [DynamicRiskCanvas(self, coordinate=i + 1, warning=warning[i], failure=failure[i],
-                                         tail=tail, remove_old=remove_old) for i in xrange(3)]
+                                         tail=tail, remove_old=remove_old) for i in range(3)]
         for graph in self.graphs:
             self.ui.y_layout.addWidget(graph)
 
