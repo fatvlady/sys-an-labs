@@ -16,7 +16,6 @@ app.setApplicationName('lab4_sa')
 form_class, base_class = loadUiType('lab_4/main_window.ui')
 
 
-
 class MainWindow(QDialog, form_class):
     # signals:
     input_changed = pyqtSignal('QString')
@@ -150,8 +149,7 @@ class MainWindow(QDialog, form_class):
         try:
             self.manager = SolverManager(self._get_params())
             self.manager.prepare(self.input_path)
-            self.manager.fit(1, self.samples_num)
-            #self.tableWidget.
+            self.manager.start_machine()
             # s = [1,2,3,4]
             # for i in range(4):
             #     for m, item in enumerate(s):

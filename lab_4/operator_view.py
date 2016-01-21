@@ -2,9 +2,10 @@
 
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QDialog
+from PyQt5.QtCore import QTimer, pyqtSlot
 from PyQt5.uic import loadUiType
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.figure import Figure
+from matplotlib.figure import Figure, Axes
 import numpy as np
 
 
@@ -14,40 +15,61 @@ form_class, base_class = loadUiType('lab_4/graph_table.ui')
 class DynamicRiskCanvas(FigureCanvas):
     """A canvas that updates itself every second with a new plot."""
 
-    def __init__(self, parent=None, coordinate=1, dpi=100, real_size=50, warning=0, failure=0):
+    def __init__(self, parent=None, coordinate=1, description=None, dpi=100, tail=10, warning=0, failure=0,
+                 remove_old=True):
         self.coordinate = coordinate
         self.warning_threshold = warning
         self.failure_threshold = failure
-        self.real_size = real_size
+        self.tail = tail
+        self.remove_old = remove_old
+        self.time_separator = None
         fig = Figure(dpi=dpi)
         self.axes = fig.add_subplot(111)
-        self.axes.set_title('$Y_{}$'.format(str(self.coordinate)), fontsize=10)
-        self.real_line = self.axes.plot([], [], 'b')
-        self.predicted_line = self.axes.plot([], [], 'g')
-        self.risk_line = self.axes.plot([], [], 'g-')
-        self.warning_line = self.axes.plot([], [], 'r-')
-        self.failure_line = self.axes.plot([], [], 'r')
+        self.axes.set_title('$Y_{}${}'.format(str(self.coordinate), '(' + description + ')' if description
+                                              else ''), fontsize=10)
+        self.real_line, self.predicted_line, self.risk_line = self.axes.plot([], [], 'black', [], [], 'g', [], [], 'g-')
         FigureCanvas.__init__(self, fig)
         self.setParent(parent)
         FigureCanvas.setSizePolicy(self,
                                    QtWidgets.QSizePolicy.Expanding,
                                    QtWidgets.QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
-        # timer = QtCore.QTimer(self)
-        # timer.timeout.connect(self.update_figure)
-        # timer.start(1000)
+
 
     def compute_initial_figure(self, real_values, predicted_values, risk_values, time_ticks):
-        self.real_line.set_data(time_ticks[:self.real_size], real_values)
-        self.predicted_line.set_data(time_ticks[self.real_size:], predicted_values)
-        self.risk_line.set_data(time_ticks[self.real_size:], risk_values)
-        self.warning_line.set_data(time_ticks, [self.warning_threshold] * len(time_ticks))
-        self.failure_line.set_data(time_ticks, [self.failure_threshold] * len(time_ticks))
+        self.real_line.set_data(time_ticks[:-self.tail], real_values)
+        self.predicted_line.set_data(time_ticks[-self.tail - 1:], np.append(real_values[-1], predicted_values))
+        self.risk_line.set_data(time_ticks[-self.tail - 1:], np.append(real_values[-1], risk_values))
+        self.axes.axhline(y=self.warning_threshold, color='r', linestyle='dotted')
+        self.axes.axhline(y=self.failure_threshold, color='r', linewidth=3)
+        self.time_separator = self.axes.axvline(x=time_ticks[-self.tail - 1], color='b')
+        self.axes.relim()
+        self.axes.autoscale_view()
+        bot, top = self.axes.get_ylim()
+        bot -= (top - bot)*0.05
+        top += (top - bot)*0.05
+        self.axes.set_ylim(bot, top)
         self.draw()
 
     def update_figure(self, real_value, predicted_values, risk_values, time_ticks):
-        l = [np.random.randint(0, 10) for i in range(4)]
-        self.axes[0, 0].plot([0, 1, 2, 3], l, 'r')
+        # retrieve old plot data
+        time_head, values_head = self.real_line.get_data()
+        # remove very old time point if needed
+        if self.remove_old:
+            time_head = time_head[1:]
+            values_head = values_head[1:]
+        # update registered data for current time point
+        time_head = np.append(time_head, time_ticks[0])
+        values_head = np.append(values_head, real_value)
+        # change graphics depending on new data sets
+        self.real_line.set_data(time_head, values_head)
+        self.predicted_line.set_data(time_ticks, np.append(real_value, predicted_values))
+        self.risk_line.set_data(time_ticks, np.append(real_value, risk_values))
+        # move current time marker
+        self.time_separator.set_xdata([time_head[-1]] * 2)
+        # redraw with new limits
+        self.axes.relim()
+        self.axes.autoscale_view()
         self.draw()
 
 
@@ -57,13 +79,29 @@ class OperatorViewWindow(QDialog):
         super(OperatorViewWindow, self).__init__(*args)
         warning = kwargs.get('warn', [0,0,0])
         failure = kwargs.get('fail', [0,0,0])
-        real_size = kwargs.get('real_size', 50)
+        tail = kwargs.get('tail', 10)
+        remove_old = kwargs.get('remove_old', True)
         self.ui = form_class()
         self.ui.setupUi(self)
+        self.engine = kwargs['callback']
         self.graphs = [DynamicRiskCanvas(self, coordinate=i + 1, warning=warning[i], failure=failure[i],
-                                         real_size=real_size) for i in range(3)]
+                                         tail=tail, remove_old=remove_old) for i in xrange(3)]
         for graph in self.graphs:
             self.ui.y_layout.addWidget(graph)
 
-    def initial_graphics_fill(self):
-        pass
+    def initial_graphics_fill(self, real_values, predicted_values, risk_values, time_ticks):
+        for i, graph in enumerate(self.graphs):
+            graph.compute_initial_figure(real_values.T[i], predicted_values[i], risk_values[i], time_ticks)
+
+    def update_graphics(self, real_value, predicted_values, risk_values, forecast_ticks):
+        for i, graph in enumerate(self.graphs):
+            graph.update_figure(real_value[i], predicted_values[i], risk_values[i], forecast_ticks)
+
+    def start(self):
+        timer = QTimer(self)
+        timer.timeout.connect(self.execute_iteration)
+        timer.start(500)
+
+    @pyqtSlot()
+    def execute_iteration(self):
+        self.engine.launch()

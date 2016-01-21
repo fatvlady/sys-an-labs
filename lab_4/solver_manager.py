@@ -43,20 +43,36 @@ class SolverManager(object):
             self.solver = SolveExpTh(d)
         else:
             self.solver = Solve(d)
-        self.data_window = None
-        self.operator_view = OperatorViewWindow()
-        self.current_iter = 1 # for what??
+        self.first_launch = True
+        self.batch_size = d['samples']
+        self.operator_view = OperatorViewWindow(warn=self.Y_C, fail=self.Y_D, callback=self)
+        self.current_iter = 1
 
     def prepare(self, filename):
         self.time, self.data = read_data(filename)
         self.N_all_iter = len(self.time)
         self.operator_view.show()
 
+    def start_machine(self):
+        self.operator_view.start()
+
+    def launch(self):
+        self.fit(self.current_iter, self.batch_size)
+        self.current_iter += 1
+
     def fit(self, shift, n):
-        self.data_window = self.data[shift:shift + n]
-        self.solver.load_data(self.data_window[:, :-2]) #y2 and y3 not used
+        data_window = self.data[shift:shift + n]
+        self.solver.load_data(data_window[:, :-2]) #y2 and y3 not used
         self.solver.prepare()
         y_forecast = self.predict()
+        if self.first_launch:
+            self.operator_view.initial_graphics_fill(real_values=data_window[:, -3:], predicted_values=y_forecast,
+                                                     risk_values=y_forecast,
+                                                     time_ticks=self.time[shift:shift + n + self.solver.pred_step])
+            self.first_launch = False
+        else:
+            self.operator_view.update_graphics(data_window[-1, -3:], y_forecast, y_forecast,
+                                               self.time[shift + n - 1:shift + n + self.solver.pred_step])
         # self.risk() # really suspicious realisation
         self.presenter = PolynomialBuilderExpTh(self.solver) if self.custom_struct else PolynomialBuilder(self.solver)
 
