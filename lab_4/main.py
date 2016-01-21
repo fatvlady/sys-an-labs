@@ -54,8 +54,6 @@ class MainWindow(QDialog, form_class):
         column_size = [40, 70, 70, 70,160, 60, 160,80]
         for index, size in enumerate(column_size):
              self.tablewidget.setColumnWidth(index,size)
-        #data = ['9999', '999', '9999,99','1234568', 'Безпечна ситуація']
-        #insert_data(self.tablewidget, 0, data)
         return
 
     @pyqtSlot()
@@ -151,7 +149,6 @@ class MainWindow(QDialog, form_class):
             self.tablewidget.setRowCount(self.predictBox.value())
             self.manager = SolverManager(self._get_params())
             self.manager.prepare(self.input_path)
-            self.manager.start_machine()
         except Exception as e:
             QMessageBox.warning(self,'Error!','Error happened during execution: ' + str(e))
         self.exec_button.setEnabled(True)

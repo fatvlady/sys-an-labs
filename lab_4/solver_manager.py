@@ -13,23 +13,22 @@ from PyQt5.uic import loadUiType
 import os
 
 
-
 def prob(x, xmax, xmin):
     res = np.fabs((x - xmax) / (xmax - xmin))
-    r = np.ma.array(res, mask = np.array(x >= xmax), fill_value= 0)
+    r = np.ma.array(res, mask=np.array(x >= xmax), fill_value=0)
     return r.filled()
 
+
 def insert_data(tw, row, data):
-        assert len(data) <= 8
-        try:
-            for i,d in enumerate(data):
-                item = QTableWidgetItem(d)
-                item.setTextAlignment(Qt.AlignHCenter)
-                tw.setItem(row,i,item)
-                print('----added row----')
-                tw.viewport().update()
-        except Exception as e:
-            raise('insert data in tabel'+str(e))
+    assert len(data) <= 8
+    try:
+        for i, d in enumerate(data):
+            item = QTableWidgetItem(d)
+            item.setTextAlignment(Qt.AlignHCenter)
+            tw.setItem(row, i, item)
+    except Exception as e:
+        raise ('insert data in table' + str(e))
+
 
 def classify_danger_rating(level):
     if 0 <= level <= 0.125:
@@ -51,7 +50,7 @@ def classify_danger_rating(level):
 
 
 class SolverManager(object):
-    Y_C = np.array([[950], [121000], [50000000]])  # warning value
+    Y_C = np.array([[930], [1000], [5000000]])  # warning value
     Y_D = np.array([[0.0], [0.0], [0.0]])  # failure value
 
     def __init__(self, d):
@@ -69,17 +68,13 @@ class SolverManager(object):
                                                               u'Запасенная\ в\ АБ\ энергия,\ Дж'])
         self.current_iter = 1
         self.tablewidget = d['tablewidget']
-        data = np.array(['816.0','950.0','131557.02445038198','41779234.62720786',
- 'Нештатна ситуація по одному параметру' ,'0.16441530745584276',
- 'Низький рівень заряду батареї' ,'1'])
-        insert_data(self.tablewidget, 5, data)
 
     def prepare(self, filename):
         self.time, self.data = read_data(filename)
         increment = self.time[-1] - self.time[-2]
-        #self.time = np.append(self.time, np.arange(1, 1 + self.forecast_size) * increment + self.time[-1])
+        self.time = np.append(self.time, np.arange(1, 1 + self.forecast_size) * increment + self.time[-1])
         self.N_all_iter = len(self.time)
-        #self.operator_view.show()
+        self.operator_view.show()
 
     def start_machine(self):
         self.operator_view.start_process()
@@ -124,15 +119,13 @@ class SolverManager(object):
         y3 = self.y_forecasted[2]
         state = self.danger_rate[:, 1]
         risk = self.f
-        reason = ['Низький рівень заряду батареї']*self.solver.pred_step
+        reason = [u'Низький рівень заряду батареї'] * self.solver.pred_step
         rate = self.danger_rate[:, 0]
 
         data = np.array([t, y1, y2, y3, state, risk, reason, rate]).T
-        insert_data(self.tablewidget, 1, str(data[0][0]))
-        insert_data(self.tablewidget, 1, data[0])
         assert data.shape == (self.solver.pred_step, 8)
         print(self.current_iter)
-        for i ,j in enumerate(data):
+        for i, j in enumerate(data):
             print(j)
             insert_data(self.tablewidget, i, j)
         print(self.current_iter)

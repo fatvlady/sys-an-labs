@@ -49,7 +49,7 @@
    <sender>start_button</sender>
    <signal>pressed()</signal>
    <receiver>OperatorWindow</receiver>
-   <slot>start_process()</slot>
+   <slot>manipulate_timer()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>599</x>
@@ -63,6 +63,6 @@
   </connection>
  </connections>
  <slots>
-  <slot>start_process()</slot>
+  <slot>manipulate_timer()</slot>
  </slots>
 </ui>
