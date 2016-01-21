@@ -45,7 +45,9 @@ class SolverManager(object):
             self.solver = Solve(d)
         self.first_launch = True
         self.batch_size = d['samples']
-        self.operator_view = OperatorViewWindow(warn=self.Y_C, fail=self.Y_D, callback=self)
+        self.operator_view = OperatorViewWindow(warn=self.Y_C, fail=self.Y_D, callback=self,
+                                                descriptions=[u'прибыль\ от\ перевозки,\ грн', u'запас\ хода,\ м',
+                                                              u'Запасенная\ в\ АБ\ энергия,\ Дж'])
         self.current_iter = 1
 
     def prepare(self, filename):
@@ -62,7 +64,7 @@ class SolverManager(object):
 
     def fit(self, shift, n):
         data_window = self.data[shift:shift + n]
-        self.solver.load_data(data_window[:, :-2]) #y2 and y3 not used
+        self.solver.load_data(data_window[:, :-2])  # y2 and y3 not used
         self.solver.prepare()
         y_forecast = self.predict()
         if self.first_launch:

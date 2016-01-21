@@ -25,7 +25,7 @@ class DynamicRiskCanvas(FigureCanvas):
         self.time_separator = None
         fig = Figure(dpi=dpi)
         self.axes = fig.add_subplot(111)
-        self.axes.set_title('$Y_{}${}'.format(str(self.coordinate), '(' + description + ')' if description
+        self.axes.set_title(u'$Y_{}{}$'.format(str(self.coordinate), u'(' + description + u')' if description
                                               else ''), fontsize=10)
         self.real_line, self.predicted_line, self.risk_line = self.axes.plot([], [], 'black', [], [], 'g', [], [], 'g-')
         FigureCanvas.__init__(self, fig)
@@ -81,11 +81,13 @@ class OperatorViewWindow(QDialog):
         failure = kwargs.get('fail', [0,0,0])
         tail = kwargs.get('tail', 10)
         remove_old = kwargs.get('remove_old', True)
+        descriptions = kwargs.get('descriptions', [None] * 3)
         self.ui = form_class()
         self.ui.setupUi(self)
         self.engine = kwargs['callback']
         self.graphs = [DynamicRiskCanvas(self, coordinate=i + 1, warning=warning[i], failure=failure[i],
-                                         tail=tail, remove_old=remove_old) for i in xrange(3)]
+                                         tail=tail, remove_old=remove_old, description=descriptions[i])
+                       for i in xrange(3)]
         for graph in self.graphs:
             self.ui.y_layout.addWidget(graph)
 
