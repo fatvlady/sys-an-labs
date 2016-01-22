@@ -12,7 +12,8 @@ from PyQt5.uic import loadUiType
 
 import os
 
-
+reason = ['Малий прибуток\n','Недостатній запас ходу\n','Низький рівень заряду АБ\n']
+#reason = [u'Малий прибуток; ',u'Недостатній запас ходу; ',u'Низький рівень заряду АБ; ']
 
 def prob(x, xmax, xmin):
     res = np.fabs((x - xmax) / (xmax - xmin))
@@ -31,9 +32,9 @@ def insert_data(tw, row, data):
             raise('insert data in tabel'+str(e))
 
 def classify_danger_rating(level):
-    if 0 <= level <= 0.125:
+    if 0 <= level <= 0.07:
         return 0, u"Безпечна ситуація"
-    elif 0.125 < level <= 0.25:
+    elif 0.07 < level <= 0.25:
         return 1, u"Нештатна ситуація по одному параметру"
     elif 0.25 < level <= 0.375:
         return 2, u"Нештатна ситуація по декількох параметрах"
@@ -68,6 +69,7 @@ class SolverManager(object):
                                                               u'Запасенная\ в\ АБ\ энергия,\ Дж'])
         self.current_iter = 1
         self.tablewidget = d['tablewidget']
+        self.reason = np.array([],dtype = str) # init warning reason
 
     def prepare(self, filename):
         self.time, self.data = read_data(filename)
@@ -106,6 +108,19 @@ class SolverManager(object):
     def risk(self):
         self.p = prob(self.y_forecasted, self.Y_C, self.Y_D)
         self.f = 1 - (1 - self.p[0, :]) * (1 - self.p[1, :]) * (1 - self.p[2, :])
+        #calculate reason warning situation
+        self.reason = np.array([],dtype = str)
+        for i in range(self.forecast_size):
+            string = ''
+            for j in range(3):
+                if self.p[j, i] > 0:
+                    string = string + reason[j]
+            if string == '':
+                self.reason = np.append(self.reason, '-')
+            else:
+                self.reason = np.append(self.reason, string)
+        assert len(self.reason) == self.forecast_size
+
         self.danger_rate = np.array([classify_danger_rating(i) for i in self.f])
 
     def predict(self):
@@ -119,7 +134,7 @@ class SolverManager(object):
         y3 = self.y_forecasted[2]
         state = self.danger_rate[:, 1]
         risk = self.f
-        reason = ['Низький рівень заряду батареї']*self.solver.pred_step
+        reason =self.reason
         rate = self.danger_rate[:, 0]
         data = np.array([t, y1, y2, y3, state, risk, reason, rate]).T
         assert data.shape == (self.solver.pred_step, 8)

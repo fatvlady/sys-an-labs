@@ -492,7 +492,7 @@
      <x>10</x>
      <y>180</y>
      <width>731</width>
-     <height>84</height>
+     <height>100</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout_10">
@@ -639,21 +639,7 @@
        <string>Processing</string>
       </property>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="3" column="0">
-        <widget class="QLabel" name="label_10">
-         <property name="text">
-          <string>Prediction steps:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="2">
-        <widget class="QSpinBox" name="predictBox">
-         <property name="value">
-          <number>10</number>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="3" rowspan="2">
+       <item row="2" column="3" rowspan="3">
         <widget class="QPushButton" name="exec_button">
          <property name="text">
           <string>Execute</string>
@@ -680,6 +666,20 @@
         <widget class="QLabel" name="label">
          <property name="text">
           <string>Learning set size (N_02)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_10">
+         <property name="text">
+          <string>Prediction steps:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="2">
+        <widget class="QSpinBox" name="predictBox">
+         <property name="value">
+          <number>10</number>
          </property>
         </widget>
        </item>
