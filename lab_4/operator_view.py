@@ -1,7 +1,7 @@
 # coding: utf8
 
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QDialog
+from PyQt5.QtWidgets import QDialog, QStatusBar
 from PyQt5.QtCore import QTimer, pyqtSlot
 from PyQt5.uic import loadUiType
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -89,6 +89,8 @@ class OperatorViewWindow(QDialog):
         self.timer = None
         self.ui = form_class()
         self.ui.setupUi(self)
+        self.status_bar = QStatusBar(self)
+        self.ui.windowLayout.addWidget(self.status_bar)
         self.engine = kwargs['callback']
         self.graphs = [DynamicRiskCanvas(self, coordinate=i + 1, warning=warning[i], failure=failure[i],
                                          tail=tail, remove_old=remove_old, description=descriptions[i])
