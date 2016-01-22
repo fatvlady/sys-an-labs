@@ -182,7 +182,9 @@ class MainWindow(QDialog, form_class):
                     dimensions=self.dimensions,
                     samples=self.samples_num, output_file=self.output_path,
                     weights=self.weight_method, lambda_multiblock=self.lambda_multiblock,
-                    pred_steps = self.predictBox.value(), tablewidget = self.tablewidget)
+                    pred_steps = self.predictBox.value(), tablewidget = self.tablewidget, \
+                    lbl = {'rmr':self.lbl_rmr, 'time': self.lbl_time, 'y1': self.lbl_y1,\
+                           'y2':self.lbl_y2, 'y3':self.lbl_y3})
 
 
 # -----------------------------------------------------#

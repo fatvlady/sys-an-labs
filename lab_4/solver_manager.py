@@ -14,6 +14,9 @@ import os
 
 reason = ['Малий прибуток\n','Недостатній запас ходу\n','Низький рівень заряду АБ\n']
 #reason = [u'Малий прибуток; ',u'Недостатній запас ходу; ',u'Низький рівень заряду АБ; ']
+def lblText(lbl, text):
+    lbl.setText(str(text)[:10])
+    return
 
 def prob(x, xmax, xmin):
     res = np.fabs((x - xmax) / (xmax - xmin))
@@ -70,6 +73,7 @@ class SolverManager(object):
         self.current_iter = 1
         self.tablewidget = d['tablewidget']
         self.reason = np.array([],dtype = str) # init warning reason
+        self.lbl = d['lbl']
 
     def prepare(self, filename):
         self.time, self.data = read_data(filename)
@@ -103,6 +107,7 @@ class SolverManager(object):
             self.operator_view.update_graphics(data_window[-1, -3:], self.y_forecasted, self.y_forecasted,
                                                self.time[shift + n - 1:shift + n + self.solver.pred_step])
         self.risk()  # really suspicious realisation
+        self.current_data()
         self.table_data_forecasted()
 
     def risk(self):
@@ -141,3 +146,11 @@ class SolverManager(object):
         for i ,j in enumerate(data):
             insert_data(self.tablewidget, i, j)
         return
+
+    def current_data(self):
+        rmr = 5
+        lblText(self.lbl['time'], self.time[self.batch_size + self.current_iter -1])
+        lblText(self.lbl['y1'], self.solver.Y_[-1,0])
+        lblText(self.lbl['y2'], self.solver.X_[0][-1,3])
+        lblText(self.lbl['y3'], self.solver.X_[1][-1,2])
+        lblText(self.lbl['rmr'], rmr)
