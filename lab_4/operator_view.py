@@ -27,7 +27,8 @@ class DynamicRiskCanvas(FigureCanvas):
         self.axes = fig.add_subplot(111)
         self.axes.set_title(u'$Y_{}{}$'.format(str(self.coordinate), u'(' + description + u')' if description
                                               else ''), fontsize=10)
-        self.real_line, self.predicted_line, self.risk_line = self.axes.plot([], [], 'black', [], [], 'g', [], [], 'g-')
+        self.real_line, self.predicted_line, self.risk_line = self.axes.plot([], [], 'black', [], [], 'g', [], [],
+                                                                             'g--')
         FigureCanvas.__init__(self, fig)
         self.setParent(parent)
         FigureCanvas.setSizePolicy(self,

@@ -99,17 +99,18 @@ class SolverManager(object):
         self.solver.load_data(self.data_window[:, :-2])  # y2 and y3 not used
         self.solver.prepare()
         self.predict()
+        self.check_sensors_consistency()
+        self.risk()  # really suspicious realisation
+        y_influenced = [y * (1 - self.f) for y in self.y_forecasted]
         if self.first_launch:
             self.operator_view.initial_graphics_fill(real_values=self.data_window[:, -3:],
                                                      predicted_values=self.y_forecasted,
-                                                     risk_values=self.y_forecasted,
+                                                     risk_values=y_influenced,
                                                      time_ticks=self.time[shift:shift + n + self.solver.pred_step])
             self.first_launch = False
         else:
-            self.operator_view.update_graphics(self.data_window[-1, -3:], self.y_forecasted, self.y_forecasted,
+            self.operator_view.update_graphics(self.data_window[-1, -3:], self.y_forecasted, y_influenced,
                                                self.time[shift + n - 1:shift + n + self.solver.pred_step])
-        self.check_sensors_consistency()
-        self.risk()  # really suspicious realisation
         self.current_data()
         self.table_data_forecasted()
 
