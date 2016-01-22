@@ -12,7 +12,11 @@ from PyQt5.uic import loadUiType
 
 import os
 
-
+reason = ['Малий прибуток\n','Недостатній запас ходу\n','Низький рівень заряду АБ\n']
+#reason = [u'Малий прибуток; ',u'Недостатній запас ходу; ',u'Низький рівень заряду АБ; ']
+def lblText(lbl, text):
+    lbl.setText(str(text)[:10])
+    return
 
 def prob(x, xmax, xmin):
     res = np.fabs((x - xmax) / (xmax - xmin))
@@ -26,15 +30,14 @@ def insert_data(tw, row, data):
                 item = QTableWidgetItem(d)
                 item.setTextAlignment(Qt.AlignHCenter)
                 tw.setItem(row,i,item)
-                print('----added row----')
-                tw.viewport().update()
+                #tw.viewport().update()
         except Exception as e:
             raise('insert data in tabel'+str(e))
 
 def classify_danger_rating(level):
-    if 0 <= level <= 0.125:
+    if 0 <= level <= 0.07:
         return 0, u"Безпечна ситуація"
-    elif 0.125 < level <= 0.25:
+    elif 0.07 < level <= 0.25:
         return 1, u"Нештатна ситуація по одному параметру"
     elif 0.25 < level <= 0.375:
         return 2, u"Нештатна ситуація по декількох параметрах"
@@ -51,7 +54,7 @@ def classify_danger_rating(level):
 
 
 class SolverManager(object):
-    Y_C = np.array([[950], [121000], [50000000]])  # warning value
+    Y_C = np.array([[950], [121000], [5000000]])  # warning value
     Y_D = np.array([[0.0], [0.0], [0.0]])  # failure value
 
     def __init__(self, d):
@@ -69,17 +72,15 @@ class SolverManager(object):
                                                               u'Запасенная\ в\ АБ\ энергия,\ Дж'])
         self.current_iter = 1
         self.tablewidget = d['tablewidget']
-        data = np.array(['816.0','950.0','131557.02445038198','41779234.62720786',
- 'Нештатна ситуація по одному параметру' ,'0.16441530745584276',
- 'Низький рівень заряду батареї' ,'1'])
-        insert_data(self.tablewidget, 5, data)
+        self.reason = np.array([],dtype = str) # init warning reason
+        self.lbl = d['lbl']
 
     def prepare(self, filename):
         self.time, self.data = read_data(filename)
         increment = self.time[-1] - self.time[-2]
-        #self.time = np.append(self.time, np.arange(1, 1 + self.forecast_size) * increment + self.time[-1])
+        self.time = np.append(self.time, np.arange(1, 1 + self.forecast_size) * increment + self.time[-1])
         self.N_all_iter = len(self.time)
-        #self.operator_view.show()
+        self.operator_view.show()
 
     def start_machine(self):
         self.operator_view.start_process()
@@ -106,11 +107,25 @@ class SolverManager(object):
             self.operator_view.update_graphics(data_window[-1, -3:], self.y_forecasted, self.y_forecasted,
                                                self.time[shift + n - 1:shift + n + self.solver.pred_step])
         self.risk()  # really suspicious realisation
+        self.current_data()
         self.table_data_forecasted()
 
     def risk(self):
         self.p = prob(self.y_forecasted, self.Y_C, self.Y_D)
         self.f = 1 - (1 - self.p[0, :]) * (1 - self.p[1, :]) * (1 - self.p[2, :])
+        #calculate reason warning situation
+        self.reason = np.array([],dtype = str)
+        for i in range(self.forecast_size):
+            string = ''
+            for j in range(3):
+                if self.p[j, i] > 0:
+                    string = string + reason[j]
+            if string == '':
+                self.reason = np.append(self.reason, '-')
+            else:
+                self.reason = np.append(self.reason, string)
+        assert len(self.reason) == self.forecast_size
+
         self.danger_rate = np.array([classify_danger_rating(i) for i in self.f])
 
     def predict(self):
@@ -124,16 +139,18 @@ class SolverManager(object):
         y3 = self.y_forecasted[2]
         state = self.danger_rate[:, 1]
         risk = self.f
-        reason = ['Низький рівень заряду батареї']*self.solver.pred_step
+        reason =self.reason
         rate = self.danger_rate[:, 0]
-
         data = np.array([t, y1, y2, y3, state, risk, reason, rate]).T
-        insert_data(self.tablewidget, 1, str(data[0][0]))
-        insert_data(self.tablewidget, 1, data[0])
         assert data.shape == (self.solver.pred_step, 8)
-        print(self.current_iter)
         for i ,j in enumerate(data):
-            print(j)
             insert_data(self.tablewidget, i, j)
-        print(self.current_iter)
         return
+
+    def current_data(self):
+        rmr = 5
+        lblText(self.lbl['time'], self.time[self.batch_size + self.current_iter -1])
+        lblText(self.lbl['y1'], self.solver.Y_[-1,0])
+        lblText(self.lbl['y2'], self.solver.X_[0][-1,3])
+        lblText(self.lbl['y3'], self.solver.X_[1][-1,2])
+        lblText(self.lbl['rmr'], rmr)
