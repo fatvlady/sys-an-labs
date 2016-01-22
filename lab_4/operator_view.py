@@ -1,7 +1,7 @@
 # coding: utf8
 
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QDialog
+from PyQt5.QtWidgets import QDialog, QStatusBar
 from PyQt5.QtCore import QTimer, pyqtSlot
 from PyQt5.uic import loadUiType
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -27,7 +27,8 @@ class DynamicRiskCanvas(FigureCanvas):
         self.axes = fig.add_subplot(111)
         self.axes.set_title(u'$Y_{}{}$'.format(str(self.coordinate), u'(' + description + u')' if description
                                               else ''), fontsize=10)
-        self.real_line, self.predicted_line, self.risk_line = self.axes.plot([], [], 'black', [], [], 'g', [], [], 'g-')
+        self.real_line, self.predicted_line, self.risk_line = self.axes.plot([], [], 'black', [], [], 'g', [], [],
+                                                                             'g--')
         FigureCanvas.__init__(self, fig)
         self.setParent(parent)
         FigureCanvas.setSizePolicy(self,
@@ -89,6 +90,8 @@ class OperatorViewWindow(QDialog):
         self.timer = None
         self.ui = form_class()
         self.ui.setupUi(self)
+        self.status_bar = QStatusBar(self)
+        self.ui.windowLayout.addWidget(self.status_bar)
         self.engine = kwargs['callback']
         self.graphs = [DynamicRiskCanvas(self, coordinate=i + 1, warning=warning[i], failure=failure[i],
                                          tail=tail, remove_old=remove_old, description=descriptions[i])

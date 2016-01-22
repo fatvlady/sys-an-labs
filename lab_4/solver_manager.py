@@ -76,48 +76,64 @@ class SolverManager(object):
                                                 descriptions=[u'прибыль\ от\ перевозки,\ грн', u'запас\ хода,\ м',
                                                               u'Запасенная\ в\ АБ\ энергия,\ Дж'])
         self.current_iter = 1
+        self.data_window = None
         self.tablewidget = d['tablewidget']
         self.reason = np.array([],dtype = str) # init warning reason
         self.lbl = d['lbl']
 
     def prepare(self, filename):
         self.time, self.data = read_data(filename)
-        # self.data = self.data[305:]
         increment = self.time[-1] - self.time[-2]
         self.time = np.append(self.time, np.arange(1, 1 + self.forecast_size) * increment + self.time[-1])
         self.N_all_iter = len(self.time)
         self.operator_view.show()
+        self.operator_view.status_bar.showMessage('Loaded successfully.', 1000)
 
     def start_machine(self):
         self.operator_view.start_process()
 
     def launch(self):
         if self.current_iter + self.batch_size < len(self.data):
-            print(self.current_iter)
             self.fit(self.current_iter, self.batch_size)
             self.current_iter += 1
         else:
             self.operator_view.timer.stop()
 
     def fit(self, shift, n):
-        data_window = self.data[shift:shift + n]
-        self.solver.load_data(data_window[:, :-2])  # y2 and y3 not used
+        self.data_window = self.data[shift:shift + n]
+        self.solver.load_data(self.data_window[:, :-2])  # y2 and y3 not used
         self.solver.prepare()
         self.predict()
+        self.check_sensors_consistency()
+        self.risk()  # really suspicious realisation
+        y_influenced = [y * (1 - self.f) for y in self.y_forecasted]
         if self.first_launch:
-            self.operator_view.initial_graphics_fill(real_values=data_window[:, -3:],
+            self.operator_view.initial_graphics_fill(real_values=self.data_window[:, -3:],
                                                      predicted_values=self.y_forecasted,
-                                                     risk_values=self.y_forecasted,
+                                                     risk_values=y_influenced,
                                                      time_ticks=self.time[shift:shift + n + self.solver.pred_step])
             self.first_launch = False
         else:
-            self.operator_view.update_graphics(data_window[-1, -3:], self.y_forecasted, self.y_forecasted,
+            self.operator_view.update_graphics(self.data_window[-1, -3:], self.y_forecasted, y_influenced,
                                                self.time[shift + n - 1:shift + n + self.solver.pred_step])
         self.y_current = np.array([self.solver.Y_[-1,0], self.solver.X_[0][-1,3], self.solver.X_[1][-1,2]])
         self.rdr_calc()
         self.risk()  # really suspicious realisation
         self.current_data()
         self.table_data_forecasted()
+
+    def check_sensors_consistency(self):
+        mask_positive = np.array([True, True, True, True, True, True, False,
+                                  True, True, True, True, True, False,
+                                  False, True, True, True, False])
+        result_positive = (self.data_window[:, :-3] < 0).max(axis=0) * mask_positive
+        if result_positive.any():
+            self.operator_view.status_bar.showMessage('Sensors {} have problems'.format(
+                    str(np.where(result_positive)[0].tolist())), 1000)
+        else:
+            self.operator_view.status_bar.showMessage('OK',1000)
+
+
 
     def risk(self):
         self.p = prob(self.y_forecasted, self.Y_C, self.Y_D)
