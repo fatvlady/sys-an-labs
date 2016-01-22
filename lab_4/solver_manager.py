@@ -20,19 +20,19 @@ def lblText(lbl, text):
 
 def prob(x, xmax, xmin):
     res = np.fabs((x - xmax) / (xmax - xmin))
-    r = np.ma.array(res, mask = np.array(x >= xmax), fill_value= 0)
+    r = np.ma.array(res, mask=np.array(x >= xmax), fill_value=0)
     return r.filled()
 
 def insert_data(tw, row, data):
-        assert len(data) <= 8
-        try:
-            for i,d in enumerate(data):
-                item = QTableWidgetItem(d)
-                item.setTextAlignment(Qt.AlignHCenter)
-                tw.setItem(row,i,item)
-                #tw.viewport().update()
-        except Exception as e:
-            raise('insert data in tabel'+str(e))
+    assert len(data) <= 8
+    try:
+        for i, d in enumerate(data):
+            item = QTableWidgetItem(d)
+            item.setTextAlignment(Qt.AlignHCenter)
+            tw.setItem(row, i, item)
+    except Exception as e:
+        raise ('insert data in table' + str(e))
+
 
 def classify_danger_rating(level):
     if 0 <= level <= 0.07:
@@ -54,7 +54,7 @@ def classify_danger_rating(level):
 
 
 class SolverManager(object):
-    Y_C = np.array([[950], [121000], [5000000]])  # warning value
+    Y_C = np.array([[930], [1000], [5000000]])  # warning value
     Y_D = np.array([[0.0], [0.0], [0.0]])  # failure value
 
     def __init__(self, d):

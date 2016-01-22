@@ -149,7 +149,6 @@ class MainWindow(QDialog, form_class):
             self.tablewidget.setRowCount(self.predictBox.value())
             self.manager = SolverManager(self._get_params())
             self.manager.prepare(self.input_path)
-            self.manager.start_machine()
         except Exception as e:
             QMessageBox.warning(self,'Error!','Error happened during execution: ' + str(e))
         self.exec_button.setEnabled(True)

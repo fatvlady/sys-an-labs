@@ -84,14 +84,15 @@ class OperatorViewWindow(QDialog):
         warning = kwargs.get('warn', [0,0,0])
         failure = kwargs.get('fail', [0,0,0])
         tail = kwargs.get('tail', 10)
-        remove_old = kwargs.get('remove_old', True)
+        remove_old = kwargs.get('remove_old', False)
         descriptions = kwargs.get('descriptions', [None] * 3)
         self.timer = None
         self.ui = form_class()
         self.ui.setupUi(self)
         self.engine = kwargs['callback']
         self.graphs = [DynamicRiskCanvas(self, coordinate=i + 1, warning=warning[i], failure=failure[i],
-                                         tail=tail, remove_old=remove_old) for i in range(3)]
+                                         tail=tail, remove_old=remove_old, description=descriptions[i])
+                       for i in range(3)]
         for graph in self.graphs:
             self.ui.y_layout.addWidget(graph)
 
@@ -103,11 +104,26 @@ class OperatorViewWindow(QDialog):
         for i, graph in enumerate(self.graphs):
             graph.update_figure(real_value[i], predicted_values[i], risk_values[i], forecast_ticks)
 
+    def closeEvent(self, event):
+        if self.timer and self.timer.isActive():
+            self.timer.stop()
+            self.timer.disconnect()
+            self.timer.deleteLater()
+        super(QDialog, self).closeEvent(event)
+
     @pyqtSlot()
-    def start_process(self):
-        self.timer = QTimer(self)
-        self.timer.timeout.connect(self.execute_iteration)
-        self.timer.start(5)
+    def manipulate_timer(self):
+        if not self.timer:
+            self.ui.start_button.setText('Pause')
+            self.timer = QTimer(self)
+            self.timer.timeout.connect(self.execute_iteration)
+            self.timer.start(50)
+        elif self.timer.isActive():
+            self.ui.start_button.setText('Continue')
+            self.timer.stop()
+        else:
+            self.ui.start_button.setText('Pause')
+            self.timer.start()
 
     @pyqtSlot()
     def execute_iteration(self):
