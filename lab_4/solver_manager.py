@@ -14,6 +14,11 @@ import os
 
 reason = [u'Малий прибуток\n',u'Недостатній запас ходу\n',u'Низький рівень заряду АБ\n']
 #reason = [u'Малий прибуток; ',u'Недостатній запас ходу; ',u'Низький рівень заряду АБ; ']
+
+def calculate_rdr_delta(ycurrent, yf,  yd):
+    maxl = np.max(yf[:-1] - yf[1:])
+    return (ycurrent - yd)/ maxl
+
 def lblText(lbl, text):
     lbl.setText(str(text)[:10])
     return
@@ -77,6 +82,7 @@ class SolverManager(object):
 
     def prepare(self, filename):
         self.time, self.data = read_data(filename)
+        # self.data = self.data[305:]
         increment = self.time[-1] - self.time[-2]
         self.time = np.append(self.time, np.arange(1, 1 + self.forecast_size) * increment + self.time[-1])
         self.N_all_iter = len(self.time)
@@ -87,6 +93,7 @@ class SolverManager(object):
 
     def launch(self):
         if self.current_iter + self.batch_size < len(self.data):
+            print(self.current_iter)
             self.fit(self.current_iter, self.batch_size)
             self.current_iter += 1
         else:
@@ -106,6 +113,8 @@ class SolverManager(object):
         else:
             self.operator_view.update_graphics(data_window[-1, -3:], self.y_forecasted, self.y_forecasted,
                                                self.time[shift + n - 1:shift + n + self.solver.pred_step])
+        self.y_current = np.array([self.solver.Y_[-1,0], self.solver.X_[0][-1,3], self.solver.X_[1][-1,2]])
+        self.rdr_calc()
         self.risk()  # really suspicious realisation
         self.current_data()
         self.table_data_forecasted()
@@ -150,7 +159,28 @@ class SolverManager(object):
     def current_data(self):
         rmr = 5
         lblText(self.lbl['time'], self.time[self.batch_size + self.current_iter -1])
-        lblText(self.lbl['y1'], self.solver.Y_[-1,0])
-        lblText(self.lbl['y2'], self.solver.X_[0][-1,3])
-        lblText(self.lbl['y3'], self.solver.X_[1][-1,2])
-        lblText(self.lbl['rmr'], rmr)
+        lblText(self.lbl['y1'], self.y_current[0])
+        lblText(self.lbl['y2'], self.y_current[1])
+        lblText(self.lbl['y3'], self.y_current[2])
+        lblText(self.lbl['rmr'], self.rdr)
+
+
+    def rdr_calc(self):
+        self.rdr = np.inf
+        rdr = np.inf
+        for i in range(3):
+            if self.y_current[i]>=self.Y_C[i,0]:
+                continue
+            if self.y_current[i]<= self.Y_D[i,0]:
+                rdr = 0
+                continue
+            s = calculate_rdr_delta(self.y_current[i], self.y_forecasted[i], self.Y_D[i,0])
+            if s <= 0:
+                continue
+            t =(self.y_current[i] - self.Y_D[i,0])/s
+            if  t < rdr:
+                rdr = t
+        if rdr != np.inf:
+            self.rdr = rdr
+        print(self.rdr)
+
