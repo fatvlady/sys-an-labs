@@ -182,6 +182,35 @@ class SolveExpTh(Solve):
     def aggregate(self, values, coeffs):
         return np.exp(np.dot(np.tanh(values), coeffs)) - 1
 
+    def calculate_value(self, X):
+        def calculate_polynomials(value, deg_lim):  # deg_lim is not reached
+            return np.array([self.poly_f(deg, value) for deg in range(deg_lim)]).T
+
+        X = np.array(X)
+        X = (X - self.minX) / (self.maxX - self.minX)
+        for i in range(len(X)):
+            if np.isnan(X[i]):
+                X[i] = 1
+        X = np.split(X, self.dim_integral[:2])
+        phi = np.array([calculate_polynomials(vector, self.deg[i]) for i, vector in enumerate(X)])
+        psi = list()
+        shift = 0
+        for i in range(3):
+            for j in range(self.dim[i]):
+                psi.append(self.aggregate(phi[i][j], self.Lamb.A[shift: shift + self.deg[i]]))
+                shift += self.deg[i]
+        psi = np.array(psi).T
+        big_phi = list()
+        for i in range(3):
+            big_phi.append([self.aggregate(psi[k, (self.dim_integral[i - 1] if i > 0 else 0): self.dim_integral[i]],
+                                           self.a.A[(self.dim_integral[i - 1] if i > 0 else 0):
+                                           self.dim_integral[i], k]) for k in range(self.dim[3])])
+        big_phi = np.array(big_phi).T
+        result = np.array([self.aggregate(big_phi[k], self.c.A[:, k]) for k in range(self.dim[3])])
+        result = result * (self.maxY - self.minY) + self.minY
+        return result
+
+
     def show(self):
         text = []
         text.append('\nError normalised (Y - F)')

@@ -409,7 +409,10 @@ class Solve(object):
         for i, x in enumerate(self.X_):
             xf = list()
             for j, xc in enumerate(x.T):
-                xf.append(forecast(xc.getA1(), self.pred_step))
+                # crutch for adequate forecast
+                diff = xc[0, -1] - xc[0, -self.pred_step - 1]
+                xf.append(xc.getA1()[-10:] + diff)
+                # xf.append(forecast(xc.getA1(), self.pred_step))
             XF.append(xf)
         yf = list()
         for s in range(1, self.pred_step + 1):
