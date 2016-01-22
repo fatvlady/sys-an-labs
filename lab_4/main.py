@@ -51,7 +51,7 @@ class MainWindow(QDialog, form_class):
         #set tablewidget
         self.tablewidget.verticalHeader().hide()
         self.tablewidget.setRowCount(0)
-        column_size = [40, 70, 70, 70,160, 60, 160,80]
+        column_size = [60, 70, 100, 100,200, 60, 200,80]
         for index, size in enumerate(column_size):
              self.tablewidget.setColumnWidth(index,size)
         return
