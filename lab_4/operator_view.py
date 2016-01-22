@@ -84,7 +84,7 @@ class OperatorViewWindow(QDialog):
         warning = kwargs.get('warn', [0,0,0])
         failure = kwargs.get('fail', [0,0,0])
         tail = kwargs.get('tail', 10)
-        remove_old = kwargs.get('remove_old', True)
+        remove_old = kwargs.get('remove_old', False)
         descriptions = kwargs.get('descriptions', [None] * 3)
         self.timer = None
         self.ui = form_class()
