@@ -76,6 +76,7 @@ class SolverManager(object):
                                                 descriptions=[u'прибыль\ от\ перевозки,\ грн', u'запас\ хода,\ м',
                                                               u'Запасенная\ в\ АБ\ энергия,\ Дж'])
         self.current_iter = 1
+        self.y_influenced = None
         self.data_window = None
         self.tablewidget = d['tablewidget']
         self.reason = np.array([],dtype = str) # init warning reason
@@ -106,19 +107,18 @@ class SolverManager(object):
         self.predict()
         self.check_sensors_consistency()
         self.risk()  # really suspicious realisation
-        y_influenced = [y * (1 - self.f) for y in self.y_forecasted]
+        self.y_influenced = [y * (1 - self.f) for y in self.y_forecasted]
         if self.first_launch:
             self.operator_view.initial_graphics_fill(real_values=self.data_window[:, -3:],
                                                      predicted_values=self.y_forecasted,
-                                                     risk_values=y_influenced,
+                                                     risk_values=self.y_influenced,
                                                      time_ticks=self.time[shift:shift + n + self.solver.pred_step])
             self.first_launch = False
         else:
-            self.operator_view.update_graphics(self.data_window[-1, -3:], self.y_forecasted, y_influenced,
+            self.operator_view.update_graphics(self.data_window[-1, -3:], self.y_forecasted, self.y_influenced,
                                                self.time[shift + n - 1:shift + n + self.solver.pred_step])
         self.y_current = np.array([self.solver.Y_[-1,0], self.solver.X_[0][-1,3], self.solver.X_[1][-1,2]])
         self.rdr_calc()
-        self.risk()  # really suspicious realisation
         self.current_data()
         self.table_data_forecasted()
 
@@ -173,7 +173,6 @@ class SolverManager(object):
         return
 
     def current_data(self):
-        rmr = 5
         lblText(self.lbl['time'], self.time[self.batch_size + self.current_iter -1])
         lblText(self.lbl['y1'], self.y_current[0])
         lblText(self.lbl['y2'], self.y_current[1])
@@ -187,14 +186,14 @@ class SolverManager(object):
         for i in range(3):
             if self.y_current[i]>=self.Y_C[i,0]:
                 continue
-            if self.y_current[i]<= self.Y_D[i,0]:
+            if self.y_current[i]<= self.Y_D  [i,0]:
                 rdr = 0
                 continue
-            s = calculate_rdr_delta(self.y_current[i], self.y_forecasted[i], self.Y_D[i,0])
+            s = calculate_rdr_delta(self.y_current[i], self.y_influenced[i], self.Y_D[i,0])
             if s <= 0:
                 continue
             t =(self.y_current[i] - self.Y_D[i,0])/s
-            if  t < rdr:
+            if t < rdr:
                 rdr = t
         if rdr != np.inf:
             self.rdr = rdr
