@@ -1,19 +1,16 @@
 # -*- encoding: utf-8 -*-
 
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QTableWidgetItem
+
+from lab_4.operator_view import OperatorViewWindow
+from lab_4.read_data import read_data
 from lab_4.solve import *
 from lab_4.solve_custom import SolveExpTh
-from lab_4.read_data import read_data
-from lab_4.operator_view import OperatorViewWindow
 
-from PyQt5.QtCore import pyqtSlot, pyqtSignal, Qt
-from PyQt5.QtGui import QTextDocument, QFont
-from PyQt5.QtWidgets import QApplication, QDialog, QFileDialog, QMessageBox, QTableWidgetItem
-from PyQt5.uic import loadUiType
-
-import os
+from matplotlib import pyplot as plt
 
 reason = [u'Малий прибуток\n',u'Недостатній запас ходу\n',u'Низький рівень заряду АБ\n']
-#reason = [u'Малий прибуток; ',u'Недостатній запас ходу; ',u'Низький рівень заряду АБ; ']
 
 def calculate_rdr_delta(ycurrent, yf,  yd):
     maxl = np.max(yf[:-1] - yf[1:])
@@ -80,6 +77,7 @@ class SolverManager(object):
         self.data_window = None
         self.tablewidget = d['tablewidget']
         self.reason = np.array([],dtype = str) # init warning reason
+        self.plotdata = dict()
         self.lbl = d['lbl']
 
     def prepare(self, filename):
@@ -87,6 +85,7 @@ class SolverManager(object):
         increment = self.time[-1] - self.time[-2]
         self.time = np.append(self.time, np.arange(1, 1 + self.forecast_size) * increment + self.time[-1])
         self.N_all_iter = len(self.time)
+        self.plotdata['rdr'] = []
         self.operator_view.show()
         self.operator_view.status_bar.showMessage('Loaded successfully.', 1000)
 
@@ -94,11 +93,15 @@ class SolverManager(object):
         self.operator_view.start_process()
 
     def launch(self):
-        if self.current_iter + self.batch_size < len(self.data):
+        if self.current_iter + self.batch_size <= len(self.data):
             self.fit(self.current_iter, self.batch_size)
             self.current_iter += 1
         else:
             self.operator_view.timer.stop()
+            self.finalizer()
+
+    def finalizer(self):
+        plt.plot(self.time[self.batch_size:-self.forecast_size], self.plotdata['rdr'])
 
     def fit(self, shift, n):
         self.data_window = self.data[shift:shift + n]
@@ -184,18 +187,16 @@ class SolverManager(object):
         self.rdr = np.inf
         rdr = np.inf
         for i in range(3):
-            if self.y_current[i]>=self.Y_C[i,0]:
-                continue
-            if self.y_current[i]<= self.Y_D  [i,0]:
+            if self.y_current[i] <= self.Y_C[i,0]:
                 rdr = 0
                 continue
-            s = calculate_rdr_delta(self.y_current[i], self.y_influenced[i], self.Y_D[i,0])
-            if s <= 0:
+            s = calculate_rdr_delta(self.y_current[i], self.y_influenced[i], self.Y_C[i,0])
+            if s <= 0 or s == np.inf:
                 continue
-            t =(self.y_current[i] - self.Y_D[i,0])/s
+            t =(self.y_current[i] - self.Y_C[i,0])/s
             if t < rdr:
                 rdr = t
         if rdr != np.inf:
             self.rdr = rdr
-        print(self.rdr)
+        self.plotdata['rdr'].append(self.rdr)
 
