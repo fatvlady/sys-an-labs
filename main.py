@@ -3,6 +3,7 @@ matplotlib.use("Qt5Agg", force=True)
 __author__ = 'vlad'
 
 if __name__ == '__main__':
+    number = None
     if not number:
         number = input('Which lab to launch => ')
     filename = 'lab_{0}/main.py'.format(number)
